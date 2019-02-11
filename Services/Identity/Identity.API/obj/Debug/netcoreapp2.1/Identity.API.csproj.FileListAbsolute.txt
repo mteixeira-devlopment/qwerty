@@ -1,0 +1,14 @@
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\bin\Debug\netcoreapp2.1\Identity.API.deps.json
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\bin\Debug\netcoreapp2.1\Identity.API.runtimeconfig.json
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\bin\Debug\netcoreapp2.1\Identity.API.runtimeconfig.dev.json
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\bin\Debug\netcoreapp2.1\Identity.API.dll
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\bin\Debug\netcoreapp2.1\Identity.API.pdb
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.csprojAssemblyReference.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.csproj.CoreCompileInputs.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.RazorAssemblyInfo.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.RazorAssemblyInfo.cs
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.AssemblyInfoInputs.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.AssemblyInfo.cs
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.RazorTargetAssemblyInfo.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.dll
+C:\Users\mteixeira\source\repos\qwerty\Services\Identity\Identity.API\obj\Debug\netcoreapp2.1\Identity.API.pdb

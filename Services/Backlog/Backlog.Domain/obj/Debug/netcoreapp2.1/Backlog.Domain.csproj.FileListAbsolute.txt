@@ -1,0 +1,8 @@
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\bin\Debug\netcoreapp2.1\Backlog.Domain.deps.json
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\bin\Debug\netcoreapp2.1\Backlog.Domain.dll
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\bin\Debug\netcoreapp2.1\Backlog.Domain.pdb
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\obj\Debug\netcoreapp2.1\Backlog.Domain.csproj.CoreCompileInputs.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\obj\Debug\netcoreapp2.1\Backlog.Domain.AssemblyInfoInputs.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\obj\Debug\netcoreapp2.1\Backlog.Domain.AssemblyInfo.cs
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\obj\Debug\netcoreapp2.1\Backlog.Domain.dll
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Domain\obj\Debug\netcoreapp2.1\Backlog.Domain.pdb

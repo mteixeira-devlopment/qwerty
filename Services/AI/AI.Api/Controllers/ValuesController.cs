@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace qwerty.AI.Api.Controllers
+namespace AI.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

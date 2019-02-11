@@ -1,17 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Identity.API.Configurations;
+using Identity.API.Data;
+using Identity.API.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
 
-namespace qwerty.AI.Identity
+namespace Identity.API
 {
     public class Startup
     {
@@ -21,15 +24,23 @@ namespace qwerty.AI.Identity
         }
 
         public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSwaggerGen(c => c.SwaggerDoc(
+                "v1", new Info { Title = "Api Getproc", Version = "v1" }));
+            
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("GooglePlatform")));
+
+            services.ConfigureIdentity(Configuration);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -39,6 +50,16 @@ namespace qwerty.AI.Identity
             {
                 app.UseHsts();
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c
+                => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APIs Getproc"));
+
+            // Criação de estruturas, usuários e permissões
+            // na base do ASP.NET Identity Core (caso ainda não
+            // existam)
+            new IdentityInitializer(context, userManager, roleManager).Initialize();
 
             app.UseHttpsRedirection();
             app.UseMvc();

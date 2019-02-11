@@ -1,0 +1,14 @@
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\bin\Debug\netcoreapp2.1\Board.Api.deps.json
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\bin\Debug\netcoreapp2.1\Board.Api.runtimeconfig.json
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\bin\Debug\netcoreapp2.1\Board.Api.runtimeconfig.dev.json
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\bin\Debug\netcoreapp2.1\Board.Api.dll
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\bin\Debug\netcoreapp2.1\Board.Api.pdb
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.csproj.CoreCompileInputs.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.RazorAssemblyInfo.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.RazorAssemblyInfo.cs
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.AssemblyInfoInputs.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.AssemblyInfo.cs
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.RazorTargetAssemblyInfo.cache
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.dll
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.pdb
+C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.csprojAssemblyReference.cache
