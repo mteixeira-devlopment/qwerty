@@ -1,9 +1,8 @@
-﻿using System;
-using Identity.API.Configurations;
+﻿using Identity.API.Configurations;
 using Identity.API.Data;
+using Identity.API.Handlers;
 using Identity.API.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -11,8 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
+using AuthenticationService = Identity.API.Services.AuthenticationService;
+using IAuthenticationService = Identity.API.Services.IAuthenticationService;
 
 namespace Identity.API
 {
@@ -35,12 +35,13 @@ namespace Identity.API
 
             services.ConfigureIdentity(Configuration);
 
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<INotificationHandler, NotificationHandler>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext context)
         {
             if (env.IsDevelopment())
             {
@@ -55,11 +56,6 @@ namespace Identity.API
 
             app.UseSwaggerUI(c
                 => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APIs Getproc"));
-
-            // Criação de estruturas, usuários e permissões
-            // na base do ASP.NET Identity Core (caso ainda não
-            // existam)
-            new IdentityInitializer(context, userManager, roleManager).Initialize();
 
             app.UseHttpsRedirection();
             app.UseMvc();
