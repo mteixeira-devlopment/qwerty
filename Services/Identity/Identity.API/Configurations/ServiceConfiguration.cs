@@ -1,5 +1,6 @@
 ﻿using Identity.API.Data;
 using Identity.API.Models;
+using Identity.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,8 +15,18 @@ namespace Identity.API.Configurations
         public static void ConfigureIdentity(
             this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<IdentityOptions>(identityOptions =>
+            {
+                identityOptions.Password.RequireDigit = false;
+                identityOptions.Password.RequireLowercase = false;
+                identityOptions.Password.RequireNonAlphanumeric = false;
+                identityOptions.Password.RequireUppercase = false;
+                identityOptions.Password.RequiredLength = 6;
+                identityOptions.Password.RequiredUniqueChars = 0;
+            });
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders();
 
             // Configuração de login
@@ -35,7 +46,6 @@ namespace Identity.API.Configurations
             {
                 authenticationOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 authenticationOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
             });
                 
             services.AddAuthentication().AddJwtBearer(bearerOptions => 

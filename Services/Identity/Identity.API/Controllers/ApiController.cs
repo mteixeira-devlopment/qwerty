@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.API.Controllers
 {
-    public abstract class ApiController : ControllerBase
+    public abstract class ApiController : Controller
     {
         private readonly INotificationHandler _notificationHandler;
 

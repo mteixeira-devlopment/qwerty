@@ -1,49 +1,43 @@
-﻿using System.Threading.Tasks;
-using Identity.API.Configurations;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Identity.API.Handlers;
 using Identity.API.Models;
+using Identity.API.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.API.Services
 {
     public class AuthenticationService : NotificationService, IAuthenticationService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly SigningConfigurations _signingConfigurations;
-        private readonly TokenConfigurations _tokenConfigurations;
 
         public AuthenticationService(
             INotificationHandler notificationHandler,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            SigningConfigurations signingConfigurations,
-            TokenConfigurations tokenConfigurations)
-            : base(notificationHandler)
+            [FromServices] UserManager<ApplicationUser> userManager) : base(notificationHandler)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
-            _signingConfigurations = signingConfigurations;
-            _tokenConfigurations = tokenConfigurations;
         }
 
-        public void CreateUser()
+        public async Task CreateUser(NewUser newUser)
         {
-            throw new System.NotImplementedException();
+            var existingUser = await _userManager.FindByNameAsync(newUser.Username);
+            if (existingUser != null)
+            {
+                NotifyWithError("Já existe um usuário com este usuário");
+                return;
+            }
+
+            var applicationUser = new ApplicationUser(newUser.Username);
+
+            var createResult = _userManager
+                .CreateAsync(applicationUser, newUser.Password).Result;
+
+            if (!createResult.Succeeded)
+            {
+                foreach (var createError in createResult.Errors)
+                    NotifyWithError(createError.Code, createError.Description);
+            }
         }
-
-        //public async Task CreateUser()
-        //{
-        //    if (await _userManager.FindByNameAsync(user.UserName) != null) return;
-
-        //    var resultado = _userManager
-        //        .CreateAsync(user, password).Result;
-
-        //    if (resultado.Succeeded &&
-        //        !string.IsNullOrWhiteSpace(initialRole))
-        //    {
-        //        _userManager.AddToRoleAsync(user, initialRole).Wait();
-        //    }
-        //}
     }
 }

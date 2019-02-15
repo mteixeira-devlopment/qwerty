@@ -1,7 +1,11 @@
-﻿namespace Identity.API.Services
+﻿using System.Threading.Tasks;
+using Identity.API.Responses;
+using Identity.API.ViewModels;
+
+namespace Identity.API.Services
 {
     public interface IAuthenticationService
     {
-        void CreateUser();
+        Task CreateUser(NewUser newUser);
     }
 }

@@ -2,7 +2,16 @@
 
 namespace Identity.API.Models
 {
-    public class ApplicationUser : IdentityUser
+    public sealed class ApplicationUser : IdentityUser
     {
+        protected ApplicationUser()
+        {
+            
+        }
+
+        public ApplicationUser(string username)
+        {
+            UserName = username;
+        }
     }
 }

@@ -17,7 +17,8 @@ namespace Identity.API.Services
         protected void NotifyWithValidation(ValidationResult validationResult)
         {
             foreach (var error in validationResult.Errors)
-                _notificationHandler.Handle(new Notification(error.ErrorCode, error.ErrorMessage));
+                _notificationHandler.Handle(
+                    new Notification(error.ErrorCode, error.ErrorMessage));
         }
 
         protected void NotifyWithError(string erroCode, string errorMessage)
@@ -26,8 +27,10 @@ namespace Identity.API.Services
         protected void NotifyWithError(string errorMessage)
             => _notificationHandler.Handle(new Notification(errorMessage));
 
-        protected bool HasNotifications() => _notificationHandler.HasNotifications();
+        protected bool HasNotifications() 
+            => _notificationHandler.HasNotifications();
 
-        protected IEnumerable<Notification> GetNotifications() => _notificationHandler.GetNotifications();
+        protected IEnumerable<Notification> GetNotifications() 
+            => _notificationHandler.GetNotifications();
     }
 }

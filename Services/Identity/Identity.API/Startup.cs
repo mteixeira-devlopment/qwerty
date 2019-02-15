@@ -30,7 +30,7 @@ namespace Identity.API
             services.AddSwaggerGen(c => c.SwaggerDoc(
                 "v1", new Info { Title = "Api Getproc", Version = "v1" }));
             
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<IdentityContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("GooglePlatform")));
 
             services.ConfigureIdentity(Configuration);
@@ -41,7 +41,7 @@ namespace Identity.API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -52,12 +52,16 @@ namespace Identity.API
                 app.UseHsts();
             }
 
+            app.UseExceptionHandler(new ExceptionHandlerOptions
+            {
+                ExceptionHandler = new ExceptionHandler().Invoke
+            });
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c
                 => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APIs Getproc"));
-
-            app.UseHttpsRedirection();
+        
             app.UseMvc();
         }
     }

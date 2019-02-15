@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Identity.API.Enumerations;
+using Identity.API.Handlers;
 using Identity.API.Models;
 using Identity.API.Services;
 using Identity.API.ViewModels;
@@ -16,12 +17,16 @@ namespace Identity.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LoginController : Controller
+    public class LoginController : ApiController
     {
+        private readonly INotificationHandler _notificationHandler;
         private readonly IAuthenticationService _authenticationService;
 
-        public LoginController(IAuthenticationService authenticationService)
+        public LoginController(
+            INotificationHandler notificationHandler,
+            IAuthenticationService authenticationService) : base(notificationHandler)
         {
+            _notificationHandler = notificationHandler;
             _authenticationService = authenticationService;
         }
 
@@ -103,8 +108,8 @@ namespace Identity.API.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> CreateDefaultUserAsync(NewUser model)
         {
-            var a = ModelState;
-            return Ok();
+            await _authenticationService.CreateUser(model);
+            return OkResponse(new {A = "Ana", B = "Pedro"});
         }
     }
 }
