@@ -24,9 +24,7 @@ namespace Identity.API.Configurations
                 identityOptions.Password.RequiredLength = 6;
                 identityOptions.Password.RequiredUniqueChars = 0;
             });
-
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<IdentityContext>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddDefaultTokenProviders();
 
             // Configuração de login

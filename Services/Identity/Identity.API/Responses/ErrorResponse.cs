@@ -6,7 +6,7 @@ namespace Identity.API.Responses
     {
         public bool Success => false;
         public int ResponseStatusCode { get; }
-        public List<string> Errors;
+        public List<string> Errors { get; }
 
         public ErrorResponse(List<string> responseErrors, int responseStatusCode)
         {

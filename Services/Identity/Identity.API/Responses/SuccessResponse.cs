@@ -3,11 +3,11 @@
     public class SuccessResponse
     {
         public bool Success => true;
-        public object Body;
+        public object Content;
 
         public SuccessResponse(object responseBody)
         {
-            Body = responseBody;
+            Content = responseBody;
         }
     }
 }

@@ -7,5 +7,6 @@ namespace Identity.API.Services
     public interface IAuthenticationService
     {
         Task CreateUser(NewUser newUser);
+        Task<string> SignInUser(SignInUser signInUser);
     }
 }

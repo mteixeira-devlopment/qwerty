@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FluentValidation.Results;
 using Identity.API.Handlers;
 using Identity.API.Models;
 
@@ -12,13 +11,6 @@ namespace Identity.API.Services
         protected NotificationService(INotificationHandler notificationHandler)
         {
             _notificationHandler = notificationHandler;
-        }
-
-        protected void NotifyWithValidation(ValidationResult validationResult)
-        {
-            foreach (var error in validationResult.Errors)
-                _notificationHandler.Handle(
-                    new Notification(error.ErrorCode, error.ErrorMessage));
         }
 
         protected void NotifyWithError(string erroCode, string errorMessage)

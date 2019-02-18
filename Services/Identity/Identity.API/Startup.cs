@@ -2,7 +2,6 @@
 using Identity.API.Data;
 using Identity.API.Handlers;
 using Identity.API.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -37,6 +36,8 @@ namespace Identity.API
 
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<INotificationHandler, NotificationHandler>();
+            services.AddTransient<IUserStore<ApplicationUser>, UserRespository>();
+            services.AddTransient<IRoleStore<ApplicationRole>, RoleRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
