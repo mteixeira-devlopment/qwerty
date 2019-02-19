@@ -45,15 +45,6 @@ namespace Identity.API
             services.AddTransient<IUserRepository, UserRespository>();
             services.AddTransient<IRoleRepository, RoleRepository>();
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    p => p.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials());
-            });
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         
