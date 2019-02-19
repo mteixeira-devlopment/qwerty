@@ -29,7 +29,7 @@ namespace Identity.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen(c => c.SwaggerDoc(
-                "v1", new Info { Title = "Api Getproc", Version = "v1" }));
+                "v1", new Info { Title = "Identity Api", Version = "v1" }));
             
             services.AddDbContext<IdentityContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("GooglePlatform")));
@@ -67,7 +67,7 @@ namespace Identity.API
             app.UseSwagger();
 
             app.UseSwaggerUI(c
-                => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APIs Getproc"));
+                => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Api"));
         
             app.UseMvc();
         }
