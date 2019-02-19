@@ -22,6 +22,7 @@ namespace Identity.API.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly TokenConfigurations _tokenConfigurations;
         private readonly SigningConfigurations _signingConfigurations;
+        private readonly IUserRepository _userRepository;
         private readonly IdentityContext _context;
 
         public AuthenticationService(
@@ -29,12 +30,16 @@ namespace Identity.API.Services
             UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager, 
             TokenConfigurations tokenConfigurations, 
-            SigningConfigurations signingConfigurations) : base(notificationHandler)
+            SigningConfigurations signingConfigurations,
+            IUserRepository userRepository, 
+            IdentityContext context) : base(notificationHandler)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenConfigurations = tokenConfigurations;
             _signingConfigurations = signingConfigurations;
+            _userRepository = userRepository;
+            _context = context;
         }
 
         public async Task CreateUser(NewUser newUser)
@@ -56,6 +61,8 @@ namespace Identity.API.Services
                 foreach (var createError in createResult.Errors)
                     NotifyWithError(createError.Code, createError.Description);
             }
+
+            await _userRepository.Commit();
         }
 
         public async Task<string> SignInUser(SignInUser signInUser)

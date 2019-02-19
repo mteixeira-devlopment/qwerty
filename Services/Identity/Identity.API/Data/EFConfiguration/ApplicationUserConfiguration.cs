@@ -13,6 +13,18 @@ namespace Identity.API.Data
                 .HasColumnName("username")
                 .HasColumnType("VARCHAR(80)")
                 .IsRequired();
+
+            builder
+                .Property(p => p.PasswordHash)
+                .HasColumnName("password-hash")
+                .HasColumnType("VARCHAR(255)")
+                .IsRequired();
+
+            builder
+                .Property(p => p.SecurityStamp)
+                .HasColumnName("security-stamp")
+                .HasColumnType("VARCHAR(255)")
+                .IsRequired();
         }
     }
 }

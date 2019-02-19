@@ -38,6 +38,7 @@ namespace Identity.API
             services.AddScoped<INotificationHandler, NotificationHandler>();
             services.AddTransient<IUserStore<ApplicationUser>, UserRespository>();
             services.AddTransient<IRoleStore<ApplicationRole>, RoleRepository>();
+            services.AddScoped<IUserRepository, UserRespository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

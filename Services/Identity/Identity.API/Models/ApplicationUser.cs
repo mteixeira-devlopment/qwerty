@@ -6,10 +6,12 @@ namespace Identity.API.Models
 {
     public sealed class ApplicationUser : Entity<ApplicationUser>
     {
-        public Guid Id { get; set; }
-        public string Username { get; set; }
+        public string Username { get; private set; }
 
-        protected ApplicationUser()
+        public string PasswordHash { get; private set; }
+        public string SecurityStamp { get; private set; }
+
+        private ApplicationUser()
         {
             
         }
@@ -17,6 +19,16 @@ namespace Identity.API.Models
         public ApplicationUser(string username)
         {
             Username = username;
+        }
+
+        public void SetPasswordHash(string passwordHash)
+        {
+            PasswordHash = passwordHash;
+        }
+
+        public void SetSecurityStamp(string securityStamp)
+        {
+            SecurityStamp = securityStamp;
         }
     }
 }
