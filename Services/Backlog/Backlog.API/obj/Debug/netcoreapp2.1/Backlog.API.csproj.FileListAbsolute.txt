@@ -11,3 +11,4 @@ C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.API\obj\Debug\ne
 C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.API\obj\Debug\netcoreapp2.1\Backlog.API.RazorTargetAssemblyInfo.cache
 C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.API\obj\Debug\netcoreapp2.1\Backlog.API.dll
 C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.API\obj\Debug\netcoreapp2.1\Backlog.API.pdb
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.API\obj\Debug\netcoreapp2.1\Backlog.API.csprojAssemblyReference.cache

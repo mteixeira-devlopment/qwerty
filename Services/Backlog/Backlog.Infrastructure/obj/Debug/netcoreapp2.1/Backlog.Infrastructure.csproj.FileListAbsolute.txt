@@ -6,3 +6,4 @@ C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Infrastructure\o
 C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Infrastructure\obj\Debug\netcoreapp2.1\Backlog.Infrastructure.AssemblyInfo.cs
 C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Infrastructure\obj\Debug\netcoreapp2.1\Backlog.Infrastructure.dll
 C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Infrastructure\obj\Debug\netcoreapp2.1\Backlog.Infrastructure.pdb
+C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Infrastructure\obj\Debug\netcoreapp2.1\Backlog.Infrastructure.csprojAssemblyReference.cache

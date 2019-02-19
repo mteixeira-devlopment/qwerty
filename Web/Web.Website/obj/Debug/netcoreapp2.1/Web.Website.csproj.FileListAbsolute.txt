@@ -5,7 +5,6 @@ C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\bin\Debug\netcoreapp2.1\W
 C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\bin\Debug\netcoreapp2.1\Web.Website.pdb
 C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\bin\Debug\netcoreapp2.1\Web.Website.Views.dll
 C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\bin\Debug\netcoreapp2.1\Web.Website.Views.pdb
-C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\obj\Debug\netcoreapp2.1\Web.Website.csprojAssemblyReference.cache
 C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\obj\Debug\netcoreapp2.1\Web.Website.csproj.CoreCompileInputs.cache
 C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\obj\Debug\netcoreapp2.1\Web.Website.RazorAssemblyInfo.cache
 C:\Users\mteixeira\source\repos\qwerty\Web\Web.Website\obj\Debug\netcoreapp2.1\Web.Website.RazorAssemblyInfo.cs

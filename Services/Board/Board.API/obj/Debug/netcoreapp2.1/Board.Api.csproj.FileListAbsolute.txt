@@ -11,4 +11,3 @@ C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcor
 C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.RazorTargetAssemblyInfo.cache
 C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.dll
 C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.pdb
-C:\Users\mteixeira\source\repos\qwerty\Services\Board\Board.Api\obj\Debug\netcoreapp2.1\Board.Api.csprojAssemblyReference.cache

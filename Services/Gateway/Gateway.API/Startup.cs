@@ -1,11 +1,10 @@
-﻿using Gateway.API.Data.EFConfiguration;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
 
 namespace Gateway.API
 {
@@ -20,29 +19,13 @@ namespace Gateway.API
        
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerGen(c => c.SwaggerDoc(
-                "v1", new Info { Title = "Gateway API", Version = "v1" }));
-
+            services.AddOcelot(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
-
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c
-                => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway API"));
-
-            app.UseHttpsRedirection();
+            app.UseOcelot().Wait();
             app.UseMvc();
         }
     }
