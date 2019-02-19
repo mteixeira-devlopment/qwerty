@@ -14,7 +14,7 @@ namespace Identity.API.Models
         {
             Id = Guid.NewGuid();
 
-            ErrorCode = StatusCode.DefaultNotificationErrorCode;
+            ErrorCode = "100";
             ErrorMessage = errorMessage;
         }
 
