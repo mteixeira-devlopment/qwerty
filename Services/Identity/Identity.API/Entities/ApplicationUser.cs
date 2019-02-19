@@ -1,8 +1,4 @@
-﻿using System;
-using System.Security.Principal;
-using Identity.API.Entities;
-
-namespace Identity.API.Models
+﻿namespace Identity.API.Entities
 {
     public sealed class ApplicationUser : Entity<ApplicationUser>
     {

@@ -6,12 +6,12 @@ namespace Identity.API.ViewModels
     {
         [Required]
         [MinLength(3)]
-        public string Username { get; }
+        public string Username { get; set; }
 
         [Required]
         [MinLength(6)]
         [MaxLength(21)]
-        public string Password { get; }
+        public string Password { get; set; }
 
         public NewUser(string password, string username)
         {

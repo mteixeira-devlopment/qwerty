@@ -9,11 +9,11 @@ namespace Identity.API.Controllers
 {
     [Route("api/identity")]
     [ApiController]
-    public class LoginController : ApiController
+    public class IdentityController : ApiController
     {
         private readonly IAuthenticationService _authenticationService;
 
-        public LoginController(
+        public IdentityController(
             INotificationHandler notificationHandler,
             IAuthenticationService authenticationService) : base(notificationHandler)
         {
@@ -25,9 +25,9 @@ namespace Identity.API.Controllers
         [Route("signin")]
         [ProducesResponseType(typeof(string), 200)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> SiginUser([FromBody]SignInUser model)
+        public async Task<IActionResult> SigInUserAsync([FromBody]SignInUser model)
         {
-            var token = await _authenticationService.SignInUser(model);
+            var token = await _authenticationService.SignInUserAsync(model);
             return OkResponse(token);
         }
 
@@ -36,9 +36,9 @@ namespace Identity.API.Controllers
         [Route("signup")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> CreateDefaultUserAsync(NewUser model)
+        public async Task<IActionResult> SignUpUserAsync(NewUser model)
         {
-            await _authenticationService.CreateUser(model);
+            await _authenticationService.SignUpUserAsync(model);
             return OkResponse();
         }
     }

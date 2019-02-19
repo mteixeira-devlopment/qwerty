@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using Identity.API.Entities;
+﻿using Identity.API.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Identity.API.Data
+namespace Identity.API.Data.EFConfiguration
 {
     internal abstract class Configuration<TEntity> : IEntityTypeConfiguration<TEntity>
         where TEntity : Entity<TEntity>

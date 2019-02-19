@@ -1,6 +1,4 @@
-﻿using Identity.API.Data;
-using Identity.API.Models;
-using Identity.API.Services;
+﻿using Identity.API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

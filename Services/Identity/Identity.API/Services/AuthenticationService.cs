@@ -6,6 +6,8 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Identity.API.Configurations;
 using Identity.API.Data;
+using Identity.API.Data.Repositories;
+using Identity.API.Entities;
 using Identity.API.Enumerations;
 using Identity.API.Handlers;
 using Identity.API.Models;
@@ -23,7 +25,6 @@ namespace Identity.API.Services
         private readonly TokenConfigurations _tokenConfigurations;
         private readonly SigningConfigurations _signingConfigurations;
         private readonly IUserRepository _userRepository;
-        private readonly IdentityContext _context;
 
         public AuthenticationService(
             INotificationHandler notificationHandler,
@@ -31,18 +32,16 @@ namespace Identity.API.Services
             SignInManager<ApplicationUser> signInManager, 
             TokenConfigurations tokenConfigurations, 
             SigningConfigurations signingConfigurations,
-            IUserRepository userRepository, 
-            IdentityContext context) : base(notificationHandler)
+            IUserRepository userRepository) : base(notificationHandler)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenConfigurations = tokenConfigurations;
             _signingConfigurations = signingConfigurations;
             _userRepository = userRepository;
-            _context = context;
         }
 
-        public async Task CreateUser(NewUser newUser)
+        public async Task SignUpUserAsync(NewUser newUser)
         {
             var existingUser = await _userManager.FindByNameAsync(newUser.Username);
             if (existingUser != null)
@@ -65,36 +64,45 @@ namespace Identity.API.Services
             await _userRepository.Commit();
         }
 
-        public async Task<string> SignInUser(SignInUser signInUser)
+        public async Task<string> SignInUserAsync(SignInUser signInUser)
         {
-            _context.Database.EnsureCreated();
+            var user = await CheckIfExistsAsync(signInUser.UserIdentity);
+            if (user == null)
+                return string.Empty;
 
-            var userIdentity = await _userManager.FindByNameAsync(signInUser.UserIdentity);
-            if (userIdentity == null)
-            {
+            var passwordIsChecked = await CheckPasswordAsync(user, signInUser.Password);
+
+            return !passwordIsChecked ? string.Empty : GenerateToken(signInUser);
+        }
+
+        private async Task<ApplicationUser> CheckIfExistsAsync(string userIdentity)
+        {
+            var user = await _userManager.FindByNameAsync(userIdentity);
+
+            if (user == null)
                 NotifyWithError("Nenhum usuário encontrado com este identificador");
-                return string.Empty;
-            }
 
+            return user;
+        }
+
+        private async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
+        {
             var signInResult = await _signInManager
-                .CheckPasswordSignInAsync(userIdentity, signInUser.Password, false);
+                .CheckPasswordSignInAsync(user, password, false);
+
             if (!signInResult.Succeeded)
-            {
                 NotifyWithError("Credencias inválidas");
-                return string.Empty;
-            }
 
-            var claimsIdentity = new ClaimsIdentity(
-                new GenericIdentity(signInUser.UserIdentity, "SignIn"),
-                new[] {
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-                    new Claim(JwtRegisteredClaimNames.UniqueName, signInUser.UserIdentity)
-                }
-            );
+            return signInResult.Succeeded;
+        }
 
-            DateTime signInDate = DateTime.Now;
-            DateTime expireDate = signInDate +
-                                     TimeSpan.FromSeconds(_tokenConfigurations.Seconds);
+        private string GenerateToken(SignInUser signInUser)
+        {
+            var claimsIdentity = GetClaims(signInUser);
+
+            var signInDate = DateTime.Now;
+            var expireDate = signInDate +
+                             TimeSpan.FromSeconds(_tokenConfigurations.Seconds);
 
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
 
@@ -108,7 +116,21 @@ namespace Identity.API.Services
                 Expires = expireDate
             });
 
-            return jwtSecurityTokenHandler.WriteToken(securityToken);
+            var token = jwtSecurityTokenHandler.WriteToken(securityToken);
+            return token;
+        }
+
+        private ClaimsIdentity GetClaims(SignInUser signInUser)
+        {
+            var claimsIdentity = new ClaimsIdentity(
+                new GenericIdentity(signInUser.UserIdentity, "SignIn"),
+                new[] {
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
+                    new Claim(JwtRegisteredClaimNames.UniqueName, signInUser.UserIdentity)
+                }
+            );
+
+            return claimsIdentity;
         }
     }
 }

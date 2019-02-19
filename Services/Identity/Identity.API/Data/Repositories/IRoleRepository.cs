@@ -1,7 +1,7 @@
 ﻿namespace Identity.API.Data.Repositories
 {
-    public class RoleRepository : IRoleRepository
+    public interface IRoleRepository
     {
-        
+
     }
 }

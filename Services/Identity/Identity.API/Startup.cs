@@ -1,7 +1,9 @@
 ﻿using Identity.API.Configurations;
 using Identity.API.Data;
+using Identity.API.Data.Repositories;
+using Identity.API.Entities;
 using Identity.API.Handlers;
-using Identity.API.Models;
+using Identity.API.Stores;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -36,9 +38,12 @@ namespace Identity.API
 
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<INotificationHandler, NotificationHandler>();
-            services.AddTransient<IUserStore<ApplicationUser>, UserRespository>();
-            services.AddTransient<IRoleStore<ApplicationRole>, RoleRepository>();
-            services.AddScoped<IUserRepository, UserRespository>();
+
+            services.AddTransient<IUserStore<ApplicationUser>, UserStores>();
+            services.AddTransient<IRoleStore<ApplicationRole>, RoleStores>();
+
+            services.AddTransient<IUserRepository, UserRespository>();
+            services.AddTransient<IRoleRepository, RoleRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
