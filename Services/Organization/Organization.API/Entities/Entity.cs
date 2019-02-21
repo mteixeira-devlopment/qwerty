@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using FluentValidation;
 using FluentValidation.Results;
 
 namespace Organization.API.Entities
 {
-    public abstract class Entity<TEntity> where TEntity : class
+    public abstract class Entity<TEntity> : AbstractValidator<TEntity> where TEntity : class
     {
         protected Entity()
         {

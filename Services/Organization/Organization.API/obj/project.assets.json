@@ -11538,9 +11538,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mteixeira\\source\\repos\\qwerty\\Services\\Organization\\Organization.API\\Organization.API.csproj",
-      "projectName": "Organization.API",
-      "projectPath": "C:\\Users\\mteixeira\\source\\repos\\qwerty\\Services\\Organization\\Organization.API\\Organization.API.csproj",
+      "projectUniqueName": "C:\\Users\\mteixeira\\source\\repos\\qwerty\\Services\\Organization\\Organization.API\\Org.API.csproj",
+      "projectName": "Org.API",
+      "projectPath": "C:\\Users\\mteixeira\\source\\repos\\qwerty\\Services\\Organization\\Organization.API\\Org.API.csproj",
       "packagesPath": "C:\\Users\\mteixeira\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\mteixeira\\source\\repos\\qwerty\\Services\\Organization\\Organization.API\\obj\\",
       "projectStyle": "PackageReference",
