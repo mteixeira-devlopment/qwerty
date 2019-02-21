@@ -21,6 +21,21 @@
         }
       ],
       "UpstreamPathTemplate": "/identity-api/signin"
+    },
+    {
+      "DownstreamPathTemplate": "/api/values",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7002
+        }
+      ],
+      "UpstreamPathTemplate": "/org-api/values",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "qw3rty#provider",
+        "AllowedScopes": []
+      }
     }
   ],
   "GlobalConfiguration": {

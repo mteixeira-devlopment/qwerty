@@ -1,6 +1,5 @@
 ﻿using Identity.API.Data.EFConfiguration;
 using Identity.API.Entities;
-using Identity.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.API.Data

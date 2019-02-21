@@ -5,6 +5,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using System;
+using System.Threading.Tasks;
+using Gateway.API.Configurations;
+using Identity.API.Configurations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Gateway.API
 {
@@ -19,6 +26,8 @@ namespace Gateway.API
        
         public void ConfigureServices(IServiceCollection services)
         {
+            services.ConfigureProvider(Configuration);
+
             services.AddOcelot(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -26,6 +35,9 @@ namespace Gateway.API
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseOcelot().Wait();
+
+            app.UseAuthentication();
+
             app.UseMvc();
         }
     }

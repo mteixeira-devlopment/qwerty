@@ -1,5 +1,4 @@
 ﻿using System;
-using Identity.API.Services;
 
 namespace Identity.API.Models
 {

@@ -1,6 +1,5 @@
 ﻿using Identity.API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +21,7 @@ namespace Identity.API.Configurations
                 identityOptions.Password.RequiredLength = 6;
                 identityOptions.Password.RequiredUniqueChars = 0;
             });
+
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddDefaultTokenProviders();
 
@@ -43,8 +43,8 @@ namespace Identity.API.Configurations
                 authenticationOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 authenticationOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             });
-                
-            services.AddAuthentication().AddJwtBearer(bearerOptions => 
+
+            services.AddAuthentication().AddJwtBearer(bearerOptions =>
             {
                 // Parâmetros para a validação dos tokens
                 var validationParams = bearerOptions.TokenValidationParameters;
@@ -61,12 +61,6 @@ namespace Identity.API.Configurations
                 // Habilita a verificação do tempo de validação de um token
                 validationParams.ValidateLifetime = true;
             });
-
-            // Habilita controle do acesso à API pelo token
-            services.AddAuthorization(
-                auth => auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser().Build()));
         }
     }
 }

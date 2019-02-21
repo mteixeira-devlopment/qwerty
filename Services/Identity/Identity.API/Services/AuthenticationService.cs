@@ -1,19 +1,14 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Identity.API.Configurations;
-using Identity.API.Data;
 using Identity.API.Data.Repositories;
 using Identity.API.Entities;
-using Identity.API.Enumerations;
 using Identity.API.Handlers;
-using Identity.API.Models;
 using Identity.API.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.API.Services

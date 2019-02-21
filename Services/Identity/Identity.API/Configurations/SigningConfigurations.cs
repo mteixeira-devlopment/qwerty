@@ -1,26 +1,27 @@
-﻿using System.Security.Cryptography;
+﻿using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.API.Configurations
 {
     public class SigningConfigurations
     {
+        private const string SecretKey = "qw3rty#@integration";
+
         /// <summary>
         /// Armazena a chave de criptografia utilizada na criação dos tokens
         /// </summary>
-        public SecurityKey Key { get; }
+        public SymmetricSecurityKey Key { get; }
 
         /// <summary>
-        /// Contém a chave de criptografia e o algoritimo de segurança utiliziado na geração da assinatura do token  
+        /// Contém a chave de criptografia e o algoritimo de segurança utiliziado
+        /// na geração da assinatura do token  
         /// </summary>
         public SigningCredentials SigningCredentials { get; }
 
         public SigningConfigurations()
         {
-            using (var provider = new RSACryptoServiceProvider(2048))
-                Key = new RsaSecurityKey(provider.ExportParameters(true));
-
-            SigningCredentials = new SigningCredentials(Key, SecurityAlgorithms.RsaSha256Signature);
+            Key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
+            SigningCredentials = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256);
         }
     }
 }
