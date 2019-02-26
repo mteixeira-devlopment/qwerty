@@ -15,11 +15,9 @@ namespace Gateway.API.Configurations
         /// </summary>
         public string Issuer { get; set; }
 
-        public int Seconds { get; set; }
+        private const string SigningCredentialsKey = "qw3rty#@integration";
 
-        private const string SigningCredentialsSecretKey = "qw3rty#@integration";
-
-        public SymmetricSecurityKey SigningCredentialsSymmetricSecurityKey { get; } =
-            new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SigningCredentialsSecretKey));
+        public SymmetricSecurityKey SigningCredentialsSymmetricKey { get; } =
+            new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SigningCredentialsKey));
     }
 }

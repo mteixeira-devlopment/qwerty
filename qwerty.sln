@@ -17,25 +17,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{CE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{7F20E6E2-E6FD-498D-9667-BD15BE05E276}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.API", "Services\Identity\Identity.API\Identity.API.csproj", "{5E15B5FA-14A2-4C31-846D-7B469916E470}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.API", "Services\Identity\Identity.API\Identity.API.csproj", "{5E15B5FA-14A2-4C31-846D-7B469916E470}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateway.API", "Services\Gateway\Gateway.API\Gateway.API.csproj", "{3CDF9FD8-78F3-4968-8074-F952F05EB20C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gateway.API", "Services\Gateway\Gateway.API\Gateway.API.csproj", "{3CDF9FD8-78F3-4968-8074-F952F05EB20C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Website", "Web\Web.Website\Web.Website.csproj", "{D5224089-53FB-4CAC-ADC9-EEBA68EE945E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Website", "Web\Web.Website\Web.Website.csproj", "{D5224089-53FB-4CAC-ADC9-EEBA68EE945E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Organization", "Organization", "{6511F11B-5FB2-43B1-B976-49A755A68676}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Organization.API", "Services\Organization\Organization.API\Organization.API.csproj", "{7D1D5B09-6A43-4D3F-98F4-D974C05E2D20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Organization.API", "Services\Organization\Organization.API\Organization.API.csproj", "{7D1D5B09-6A43-4D3F-98F4-D974C05E2D20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backlog.Domain", "Services\Backlog\Backlog.Domain\Backlog.Domain.csproj", "{A9AED0B9-CD74-47B2-8E86-696486066ED2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backlog.Domain", "Services\Backlog\Backlog.Domain\Backlog.Domain.csproj", "{A9AED0B9-CD74-47B2-8E86-696486066ED2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backlog.API", "Services\Backlog\Backlog.API\Backlog.API.csproj", "{10EF4400-9D5C-4451-9195-377F1105109F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backlog.API", "Services\Backlog\Backlog.API\Backlog.API.csproj", "{10EF4400-9D5C-4451-9195-377F1105109F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backlog.Infrastructure", "Services\Backlog\Backlog.Infrastructure\Backlog.Infrastructure.csproj", "{88624BB4-C288-4645-A2D1-1D63CEDC567B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backlog.Infrastructure", "Services\Backlog\Backlog.Infrastructure\Backlog.Infrastructure.csproj", "{88624BB4-C288-4645-A2D1-1D63CEDC567B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backlog.Application", "Services\Backlog\Backlog.Application\Backlog.Application.csproj", "{F0423318-0BC5-4740-94A3-8AAFA7E882DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backlog.Application", "Services\Backlog\Backlog.Application\Backlog.Application.csproj", "{F0423318-0BC5-4740-94A3-8AAFA7E882DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Board.API", "Services\Board\Board.Api\Board.Api.csproj", "{61717AEA-842F-43D3-8719-7C78F15028ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Board.Api", "Services\Board\Board.Api\Board.Api.csproj", "{61717AEA-842F-43D3-8719-7C78F15028ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AI.Api", "Services\AI\AI.Api\AI.Api.csproj", "{CEA618CD-2A54-488F-ABA4-AE312E38D5B2}"
 EndProject

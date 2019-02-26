@@ -18,4 +18,6 @@
     <PackageReference Include="Ocelot" Version="13.0.0" />
     <PackageReference Include="IdentityServer4" Version="2.3.2" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties routesettings_1json__JSONSchema="http://json.schemastore.org/bozr" /></VisualStudio></ProjectExtensions>
 </Project>

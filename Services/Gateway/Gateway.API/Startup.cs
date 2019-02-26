@@ -1,17 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using System;
-using System.Threading.Tasks;
 using Gateway.API.Configurations;
-using Identity.API.Configurations;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+using Ocelot.Configuration.Creator;
 
 namespace Gateway.API
 {
@@ -34,7 +30,25 @@ namespace Gateway.API
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseOcelot().Wait();
+            var configuration = new OcelotPipelineConfiguration
+            {
+                AuthorisationMiddleware = async (ctx, next) =>
+                {
+                    var user = ctx.HttpContext.User;
+
+                    var bearer = ctx.DownstreamRequest
+                        .Headers
+                        .Authorization
+                        .ToString();
+
+                    var userIdentityHeader = new AddHeader("userIdentity", "");
+                    ctx.DownstreamReRoute.AddHeadersToUpstream.Add(userIdentityHeader);
+
+                    await next.Invoke();
+                }
+            };
+
+            app.UseOcelot(configuration).Wait();
 
             app.UseAuthentication();
 

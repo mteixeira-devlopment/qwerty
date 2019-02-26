@@ -16,6 +16,8 @@ namespace Organization.API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            var a = Request.Headers;
+            var b = a["unique_name"];
             return new string[] { "value1", "value2" };
         }
     }

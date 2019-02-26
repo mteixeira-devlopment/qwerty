@@ -35,10 +35,25 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "qw3rty#provider",
         "AllowedScopes": []
+      },
+      "DownstreamHeaderTransform": {
+        "test": "DownstreamHeaderTransform works"
+      },
+      "UpstreamHeaderTransform": {
+        "test": "UpstreamHeaderTransform works"
+      },
+      "AddHeadersToRequest": {
+        "unique_name": "Claims[UniqueName]",
+        "jertrudes": "dfsfds"
+      },
+      "AddClaimsToRequest": {
+        "UserType": "fgdg"
       }
+
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7000"
+    "BaseUrl": "https://localhost:7000",
+    "Re":  "" 
   }
 }

@@ -66,8 +66,11 @@ namespace Identity.API.Services
                 return string.Empty;
 
             var passwordIsChecked = await CheckPasswordAsync(user, signInUser.Password);
+            if (!passwordIsChecked)
+                return string.Empty;
 
-            return !passwordIsChecked ? string.Empty : GenerateToken(signInUser);
+            var token = GenerateToken(signInUser);
+            return token;
         }
 
         private async Task<ApplicationUser> CheckIfExistsAsync(string userIdentity)
