@@ -12,3 +12,17 @@ C:\Users\mteixeira\source\repos\qwerty\Services\Gateway\Gateway.API\obj\Debug\ne
 C:\Users\mteixeira\source\repos\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.RazorTargetAssemblyInfo.cache
 C:\Users\mteixeira\source\repos\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.dll
 C:\Users\mteixeira\source\repos\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.pdb
+C:\qwerty\Services\Gateway\Gateway.API\bin\Debug\netcoreapp2.1\Gateway.API.deps.json
+C:\qwerty\Services\Gateway\Gateway.API\bin\Debug\netcoreapp2.1\Gateway.API.runtimeconfig.json
+C:\qwerty\Services\Gateway\Gateway.API\bin\Debug\netcoreapp2.1\Gateway.API.runtimeconfig.dev.json
+C:\qwerty\Services\Gateway\Gateway.API\bin\Debug\netcoreapp2.1\Gateway.API.dll
+C:\qwerty\Services\Gateway\Gateway.API\bin\Debug\netcoreapp2.1\Gateway.API.pdb
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.csprojResolveAssemblyReference.cache
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.csproj.CoreCompileInputs.cache
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.RazorAssemblyInfo.cache
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.RazorAssemblyInfo.cs
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.AssemblyInfoInputs.cache
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.AssemblyInfo.cs
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.RazorTargetAssemblyInfo.cache
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.dll
+C:\qwerty\Services\Gateway\Gateway.API\obj\Debug\netcoreapp2.1\Gateway.API.pdb

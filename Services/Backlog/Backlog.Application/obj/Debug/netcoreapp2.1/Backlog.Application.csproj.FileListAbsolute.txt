@@ -1,8 +1,0 @@
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\bin\Debug\netcoreapp2.1\Backlog.Application.deps.json
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\bin\Debug\netcoreapp2.1\Backlog.Application.dll
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\bin\Debug\netcoreapp2.1\Backlog.Application.pdb
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\obj\Debug\netcoreapp2.1\Backlog.Application.csproj.CoreCompileInputs.cache
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\obj\Debug\netcoreapp2.1\Backlog.Application.AssemblyInfoInputs.cache
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\obj\Debug\netcoreapp2.1\Backlog.Application.AssemblyInfo.cs
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\obj\Debug\netcoreapp2.1\Backlog.Application.dll
-C:\Users\mteixeira\source\repos\qwerty\Services\Backlog\Backlog.Application\obj\Debug\netcoreapp2.1\Backlog.Application.pdb

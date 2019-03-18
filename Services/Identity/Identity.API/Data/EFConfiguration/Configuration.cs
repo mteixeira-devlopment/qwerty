@@ -1,11 +1,11 @@
-﻿using Identity.API.Entities;
+﻿using Identity.API.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Identity.API.Data.EFConfiguration
 {
     internal abstract class Configuration<TEntity> : IEntityTypeConfiguration<TEntity>
-        where TEntity : Entity<TEntity>
+        where TEntity : Entity
     {
         private EntityTypeBuilder<TEntity> _builder;
 
@@ -20,7 +20,6 @@ namespace Identity.API.Data.EFConfiguration
                 .Property(e => e.Id)
                 .HasColumnName("id")
                 .HasColumnType("VARCHAR(38)")
-                .ValueGeneratedOnAdd()
                 .IsRequired();
 
             MapConfiguration(builder);

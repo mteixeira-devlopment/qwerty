@@ -1,8 +1,8 @@
 ﻿using Identity.API.Configurations;
 using Identity.API.Data;
 using Identity.API.Data.Repositories;
-using Identity.API.Entities;
-using Identity.API.Handlers;
+using Identity.API.Domain;
+using Identity.API.SharedKernel.Handlers;
 using Identity.API.Stores;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,8 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
-using AuthenticationService = Identity.API.Services.AuthenticationService;
-using IAuthenticationService = Identity.API.Services.IAuthenticationService;
 
 namespace Identity.API
 {
@@ -36,28 +34,23 @@ namespace Identity.API
 
             services.ConfigureIdentity(Configuration);
 
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<INotificationHandler, NotificationHandler>();
+            services.AddScoped<IDomainNotificationHandler, DomainNotificationHandler>();
 
-            services.AddTransient<IUserStore<ApplicationUser>, UserStores>();
-            services.AddTransient<IRoleStore<ApplicationRole>, RoleStores>();
+            services.AddTransient<IUserStore<User>, UserStores>();
+            services.AddTransient<IRoleStore<Role>, RoleStores>();
 
             services.AddTransient<IUserRepository, UserRespository>();
             services.AddTransient<IRoleRepository, RoleRepository>();
+
+            services.ConfigureBus();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            else app.UseHsts();
 
             app.UseExceptionHandler(new ExceptionHandlerOptions
             {
@@ -68,7 +61,7 @@ namespace Identity.API
 
             app.UseSwaggerUI(c
                 => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Api"));
-        
+    
             app.UseMvc();
         }
     }

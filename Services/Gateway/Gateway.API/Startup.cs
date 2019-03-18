@@ -36,11 +36,6 @@ namespace Gateway.API
                 {
                     var user = ctx.HttpContext.User;
 
-                    var bearer = ctx.DownstreamRequest
-                        .Headers
-                        .Authorization
-                        .ToString();
-
                     var userIdentityHeader = new AddHeader("userIdentity", "");
                     ctx.DownstreamReRoute.AddHeadersToUpstream.Add(userIdentityHeader);
 

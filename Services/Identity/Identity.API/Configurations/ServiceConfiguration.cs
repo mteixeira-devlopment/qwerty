@@ -1,4 +1,4 @@
-﻿using Identity.API.Entities;
+﻿using Identity.API.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +22,7 @@ namespace Identity.API.Configurations
                 identityOptions.Password.RequiredUniqueChars = 0;
             });
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services.AddIdentity<User, Role>()
                 .AddDefaultTokenProviders();
 
             // Configuração de login

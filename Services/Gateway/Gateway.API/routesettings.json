@@ -31,7 +31,7 @@
           "Port": 7002
         }
       ],
-      "UpstreamPathTemplate": "/org-api/values",
+      "UpstreamPathTemplate": "/account-api/values",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "qw3rty#provider",
         "AllowedScopes": []

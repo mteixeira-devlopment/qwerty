@@ -1,12 +1,12 @@
 ﻿using Identity.API.Data.EFConfiguration;
-using Identity.API.Entities;
+using Identity.API.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.API.Data
 {
     public class IdentityContext : DbContext
     {
-        public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public IdentityContext(DbContextOptions<IdentityContext> options)
             : base(options)
@@ -15,7 +15,7 @@ namespace Identity.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
         }
     }
 }

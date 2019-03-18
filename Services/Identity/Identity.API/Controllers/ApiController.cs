@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Identity.API.Handlers;
-using Identity.API.Responses;
+using Identity.API.SharedKernel.Handlers;
+using Identity.API.SharedKernel.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.API.Controllers
 {
     public abstract class ApiController : Controller
     {
-        private readonly INotificationHandler _notificationHandler;
+        protected readonly IDomainNotificationHandler DomainNotificationHandler;
 
-        protected ApiController(INotificationHandler notificationHandler)
+        protected ApiController(IDomainNotificationHandler domainNotificationHandler)
         {
-            _notificationHandler = notificationHandler as NotificationHandler;
+            DomainNotificationHandler = domainNotificationHandler;
         }
 
         protected IActionResult OkResponse(object result = null)
@@ -20,7 +20,7 @@ namespace Identity.API.Controllers
             if (IsValidRequest())
                 return Ok(new SuccessResponse(result));
 
-            var errors = _notificationHandler
+            var errors = DomainNotificationHandler
                 .GetNotifications()
                 .Select(n => n.ErrorMessage)
                 .ToList();
@@ -38,7 +38,7 @@ namespace Identity.API.Controllers
 
         private bool IsValidRequest()
         {
-            return !_notificationHandler.HasNotifications();
+            return !DomainNotificationHandler.HasNotifications();
         }
     }
 }
