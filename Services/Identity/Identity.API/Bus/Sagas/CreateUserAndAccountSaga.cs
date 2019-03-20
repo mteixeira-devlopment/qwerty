@@ -17,25 +17,13 @@ namespace Identity.API.Bus.Sagas
         IHandleMessages<ValidateAccountCommand>,
         IHandleMessages<AccountValidatedEvent>
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly TokenConfigurations _tokenConfigurations;
-        private readonly SigningConfigurations _signingConfigurations;
-        private readonly IUserRepository _userRepository;
+
+        private readonly ISignUpService _signUpService;
 
         public CreateUserAndAccountSaga(
-            [FromServices] IDomainNotificationHandler domainNotificationHandler,
-            [FromServices] UserManager<User> userManager,
-            [FromServices] SignInManager<User> signInManager,
-            [FromServices] TokenConfigurations tokenConfigurations,
-            [FromServices] SigningConfigurations signingConfigurations,
-            [FromServices] IUserRepository userRepository)
+            [FromServices] ISignUpService signUpService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _tokenConfigurations = tokenConfigurations;
-            _signingConfigurations = signingConfigurations;
-            _userRepository = userRepository;
+            _signUpService = signUpService;
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CreateUserAndAccountSagaData> mapper)
@@ -49,26 +37,8 @@ namespace Identity.API.Bus.Sagas
 
         public async Task Handle(ValidateUserCommand message, IMessageHandlerContext context)
         {
-            var existingUser = await _userManager.FindByNameAsync(message.Username);
-            if (existingUser != null)
-            {
-                //DomainNotificationHandler.NotifyWithError("Já existe um usuário com este identificador");
-                //return OkResponse();
-            }
-
-            var applicationUser = new User(message.Username);
-
-            var createResult = _userManager
-                .CreateAsync(applicationUser, message.Password).Result;
-
-            if (!createResult.Succeeded)
-            {
-                foreach (var createError in createResult.Errors)
-                    // DomainNotificationHandler.NotifyWithError(createError.Description);
-                    Console.WriteLine("A");
-            }
-
-            await _userRepository.Commit();
+            var user = new User(message.Username);
+            await _signUpService.SignUp(user, message.Password);
         }
 
         public async Task Handle(ValidateAccountCommand message, IMessageHandlerContext context)

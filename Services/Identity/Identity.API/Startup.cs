@@ -42,6 +42,8 @@ namespace Identity.API
             services.AddTransient<IUserRepository, UserRespository>();
             services.AddTransient<IRoleRepository, RoleRepository>();
 
+            services.AddTransient<ISignUpService, SignUpService>();
+
             services.ConfigureBus();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

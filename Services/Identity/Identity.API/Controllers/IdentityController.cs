@@ -133,32 +133,12 @@ namespace Identity.API.Controllers
                 {
                     message.Username = model.Username;
                     message.Password = model.Password;
+                    message.FullName = model.FullName;
+                    message.BirthDate = model.BirthDate;
+                    message.Document = model.Document;
                 })
                 .ConfigureAwait(false);
 
-            //var existingUser = await _userManager.FindByNameAsync(model.Username);
-            //if (existingUser != null)
-            //{
-            //    DomainNotificationHandler.NotifyWithError("Já existe um usuário com este identificador");
-            //    return OkResponse();
-            //}
-
-            //var applicationUser = new User(model.Username);
-
-            //var createResult = _userManager
-            //    .CreateAsync(applicationUser, model.Password).Result;
-
-            //if (!createResult.Succeeded)
-            //{
-            //    foreach (var createError in createResult.Errors)
-            //        DomainNotificationHandler.NotifyWithError(createError.Description);
-            //}
-
-           
-            
-
-            //await _userRepository.Commit();
-            
             return OkResponse();
         }
     }
