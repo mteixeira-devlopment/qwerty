@@ -20,8 +20,7 @@ namespace Identity.API.Configurations
             transport.UseConventionalRoutingTopology();
 
             var routing = transport.Routing();
-
-            // Validate account route
+            
             routing.RouteToEndpoint(
                 assembly: typeof(ValidateAccountCommand).Assembly,
                 destination: "Qwerty.Api.Account");
