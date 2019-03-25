@@ -24,7 +24,7 @@ namespace Identity.API.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly TokenConfigurations _tokenConfigurations;
-        private readonly SigningConfigurations _signingConfigurations;
+        private readonly CredentialConfigurations _signingConfigurations;
         private readonly IUserRepository _userRepository;
 
         public IdentityController(
@@ -32,7 +32,7 @@ namespace Identity.API.Controllers
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             TokenConfigurations tokenConfigurations,
-            SigningConfigurations signingConfigurations,
+            CredentialConfigurations signingConfigurations,
             IUserRepository userRepository) : base(domainNotificationHandler)
         {
             _userManager = userManager;
@@ -49,7 +49,7 @@ namespace Identity.API.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> SigInUserAsync([FromBody]SignInUser model)
         {
-            var user = await CheckIfExistsAsync(model.UserIdentity);
+            var user = await CheckIfExistsAsync(model.Username);
             if (user == null)
                 return OkResponse();
 
@@ -67,7 +67,7 @@ namespace Identity.API.Controllers
             var user = await _userManager.FindByNameAsync(userIdentity);
 
             if (user == null)
-                DomainNotificationHandler.NotifyWithError("Nenhum usuário encontrado com este identificador");
+                DomainNotificationHandler.Notify("Nenhum usuário encontrado com este identificador");
 
             return user;
         }
@@ -78,7 +78,7 @@ namespace Identity.API.Controllers
                 .CheckPasswordSignInAsync(user, password, false);
 
             if (!signInResult.Succeeded)
-                DomainNotificationHandler.NotifyWithError("Credencias inválidas");
+                DomainNotificationHandler.Notify("Credencias inválidas");
 
             return signInResult.Succeeded;
         }

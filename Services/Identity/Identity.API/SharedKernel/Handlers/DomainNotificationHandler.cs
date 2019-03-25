@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Identity.API.SharedKernel.Models;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -6,20 +7,22 @@ namespace Identity.API.SharedKernel.Handlers
 {
     public sealed class DomainNotificationHandler : IDomainNotificationHandler
     {
-        private readonly List<Notification> _notifications;
+        private readonly List<DomainNotification> _notifications;
 
         public DomainNotificationHandler()
         {
-            _notifications = new List<Notification>();
+            _notifications = new List<DomainNotification>();
         }
 
-        public void NotifyWithError(string errorMessage)
-            => Handle(new Notification(errorMessage));
+        public void Notify(string errorMessage)
+            => Handle(new DomainNotification(errorMessage));
 
         public bool HasNotifications() => _notifications.Any();
 
-        public List<Notification> GetNotifications() => _notifications;
+        public List<DomainNotification> GetNotifications() => _notifications;
 
-        private void Handle(Notification message) => _notifications.Add(message);
+        public DomainNotification GetFirst() => _notifications.First();
+
+        private void Handle(DomainNotification message) => _notifications.Add(message);
     }
 }

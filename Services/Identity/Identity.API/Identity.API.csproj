@@ -17,12 +17,4 @@
 
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Bus\Handlers\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Account\Account.API\Account.API.csproj" />
-  </ItemGroup>
 </Project>

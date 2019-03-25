@@ -4618,23 +4618,6 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XPath.XDocument.dll": {}
         }
-      },
-      "Account.API/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v2.1",
-        "dependencies": {
-          "Microsoft.NETCore.App": "2.1.0",
-          "NServiceBus": "7.1.6",
-          "NServiceBus.Newtonsoft.Json": "2.2.0",
-          "NServiceBus.RabbitMQ": "5.0.3",
-          "Swashbuckle.AspNetCore": "3.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Account.API.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Account.API.dll": {}
-        }
       }
     }
   },
@@ -12237,16 +12220,10 @@
         "system.xml.xpath.xdocument.4.3.0.nupkg.sha512",
         "system.xml.xpath.xdocument.nuspec"
       ]
-    },
-    "Account.API/1.0.0": {
-      "type": "project",
-      "path": "../../Account/Account.API/Account.API.csproj",
-      "msbuildProject": "../../Account/Account.API/Account.API.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
-      "Account.API >= 1.0.0",
       "Microsoft.AspNetCore.App >= 2.1.1",
       "Microsoft.AspNetCore.Razor.Design >= 2.1.2",
       "Microsoft.NETCore.App >= 2.1.0",
@@ -12289,11 +12266,7 @@
       },
       "frameworks": {
         "netcoreapp2.1": {
-          "projectReferences": {
-            "C:\\qwerty\\Services\\Account\\Account.API\\Account.API.csproj": {
-              "projectPath": "C:\\qwerty\\Services\\Account\\Account.API\\Account.API.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {

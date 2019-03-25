@@ -5,8 +5,9 @@ namespace Identity.API.SharedKernel.Handlers
 {
     public interface IDomainNotificationHandler
     {
-        List<Notification> GetNotifications();
-        void NotifyWithError(string errorMessage);
+        List<DomainNotification> GetNotifications();
+        DomainNotification GetFirst();
+        void Notify(string errorMessage);
         bool HasNotifications();
     }
 }

@@ -3,7 +3,7 @@ using Bus.Events;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 
-namespace Identity.API.Configurations
+namespace Account.API.Configurations
 {
     internal static class BusConfiguration
     {
@@ -11,7 +11,7 @@ namespace Identity.API.Configurations
 
         public static void ConfigureBus(this IServiceCollection service)
         {
-            var endpointConfiguration = new EndpointConfiguration("Qwerty.Api.Identity");
+            var endpointConfiguration = new EndpointConfiguration("Qwerty.Api.Account");
 
             var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
             transport.ConfigureTransport();
@@ -38,8 +38,8 @@ namespace Identity.API.Configurations
 
         private static void ConfigureRouting(this RoutingSettings<RabbitMQTransport> routing)
         {
-            routing.RouteToEndpoint(typeof(ValidateAccountCommand), "Qwerty.Api.Account");
-            routing.RouteToEndpoint(typeof(UserInvalidatedEvent), "Qwerty.Api.Identity");
+            routing.RouteToEndpoint(typeof(AccountValidatedEvent), "Qwerty.Api.Identity");
+            routing.RouteToEndpoint(typeof(AccountInvalidatedEvent), "Qwerty.Api.Identity");
         }
 
         private static void ConfigureConventions(this ConventionsBuilder conventions)

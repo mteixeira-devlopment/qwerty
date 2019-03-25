@@ -3,10 +3,8 @@ using System.Threading.Tasks;
 using Bus.Commands;
 using Bus.Events;
 using Identity.API.Configurations;
-using Identity.API.Data.Repositories;
 using Identity.API.Domain;
 using Identity.API.SharedKernel.Handlers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NServiceBus;
 
@@ -14,15 +12,17 @@ namespace Identity.API.Bus.Sagas
 {
     public class CreateUserAndAccountSaga : Saga<CreateUserAndAccountSagaData>,
         IAmStartedByMessages<ValidateUserCommand>,
-        IHandleMessages<ValidateAccountCommand>,
-        IHandleMessages<AccountValidatedEvent>
+        IHandleMessages<AccountValidatedEvent>,
+        IHandleMessages<AccountInvalidatedEvent>
     {
-
+        private readonly IDomainNotificationHandler _domainNotificationHandler;
         private readonly ISignUpService _signUpService;
 
         public CreateUserAndAccountSaga(
+            [FromServices] IDomainNotificationHandler domainNotificationHandler,
             [FromServices] ISignUpService signUpService)
         {
+            _domainNotificationHandler = domainNotificationHandler;
             _signUpService = signUpService;
         }
 
@@ -31,19 +31,41 @@ namespace Identity.API.Bus.Sagas
             mapper.ConfigureMapping<ValidateUserCommand>(message => message.UserId)
                 .ToSaga(sagaData => sagaData.UserId);
 
-            mapper.ConfigureMapping<ValidateAccountCommand>(message => message.UserId)
+            mapper.ConfigureMapping<AccountInvalidatedEvent>(message => message.UserId)
                 .ToSaga(sagaData => sagaData.UserId);
         }
 
         public async Task Handle(ValidateUserCommand message, IMessageHandlerContext context)
         {
             var user = new User(message.Username);
-            await _signUpService.SignUp(user, message.Password);
+            var signUp = await _signUpService.SignUp(user, message.Password);
+
+            if (!signUp)
+            {
+                await HandlerInvalidatedUser(user.Id);
+                return;
+            }
+
+            var validateAccountCommand = 
+                new ValidateAccountCommand(user.Id, message.FullName, message.BirthDate, message.Document);
+
+            await BusConfiguration
+                .BusEndpointInstance
+                .Send(validateAccountCommand)
+                .ConfigureAwait(false);
         }
 
-        public async Task Handle(ValidateAccountCommand message, IMessageHandlerContext context)
+        private async Task HandlerInvalidatedUser(Guid userId)
         {
-            await context.Send(message).ConfigureAwait(false);
+            var invalidateReason = _domainNotificationHandler.GetFirst().ErrorMessage;
+            var userInvalidatedEvent = new UserInvalidatedEvent(invalidateReason);
+
+            await BusConfiguration
+                .BusEndpointInstance
+                .Publish(userInvalidatedEvent)
+                .ConfigureAwait(false);
+
+            MarkAsComplete();
         }
 
         public Task Handle(AccountValidatedEvent message, IMessageHandlerContext context)
@@ -51,5 +73,9 @@ namespace Identity.API.Bus.Sagas
             throw new NotImplementedException();
         }
 
+        public Task Handle(AccountInvalidatedEvent message, IMessageHandlerContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

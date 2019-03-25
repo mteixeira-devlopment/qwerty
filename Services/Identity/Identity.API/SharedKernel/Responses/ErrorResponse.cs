@@ -2,7 +2,7 @@
 
 namespace Identity.API.SharedKernel.Responses
 {
-    public class ErrorResponse
+    internal sealed class ErrorResponse
     {
         public bool Success => false;
         public int ResponseStatusCode { get; }

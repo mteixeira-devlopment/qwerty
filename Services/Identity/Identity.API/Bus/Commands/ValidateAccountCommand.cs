@@ -9,5 +9,13 @@ namespace Bus.Commands
         public string FullName { get; set; }
         public DateTime BirthDate { get; set; }
         public string Document { get; set; }
+
+        public ValidateAccountCommand(Guid userId, string fullName, DateTime birthDate, string document)
+        {
+            UserId = userId;
+            FullName = fullName;
+            BirthDate = birthDate;
+            Document = document;
+        }
     }
 }

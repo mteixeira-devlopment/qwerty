@@ -5,6 +5,6 @@ namespace Identity.API.Domain
 {
     public interface ISignUpService
     {
-        Task SignUp(User user, string password);
+        Task<bool> SignUp(User user, string password);
     }
 }

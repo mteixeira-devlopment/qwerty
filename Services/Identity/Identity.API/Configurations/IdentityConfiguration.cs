@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Identity.API.Configurations
 {
-    public static class ServiceConfiguration
+    internal static class IdentityConfiguration
     {
         public static void ConfigureIdentity(
             this IServiceCollection services, IConfiguration configuration)
@@ -26,7 +26,7 @@ namespace Identity.API.Configurations
                 .AddDefaultTokenProviders();
 
             // Configuração de login
-            var signingConfigurations = new SigningConfigurations();
+            var signingConfigurations = new CredentialConfigurations();
             services.AddSingleton(signingConfigurations);
 
             var tokenConfigurations = new TokenConfigurations();

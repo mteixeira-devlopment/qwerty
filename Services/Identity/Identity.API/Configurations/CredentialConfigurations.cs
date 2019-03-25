@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.API.Configurations
 {
-    public class SigningConfigurations
+    public sealed class CredentialConfigurations
     {
         private const string SecretKey = "qw3rty#@integration";
 
@@ -18,7 +18,7 @@ namespace Identity.API.Configurations
         /// </summary>
         public SigningCredentials SigningCredentials { get; }
 
-        public SigningConfigurations()
+        public CredentialConfigurations()
         {
             Key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
             SigningCredentials = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256);

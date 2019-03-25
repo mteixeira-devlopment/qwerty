@@ -2,7 +2,6 @@
 using Identity.API.Configurations;
 using Identity.API.Data.Repositories;
 using Identity.API.SharedKernel.Handlers;
-using Identity.API.ViewModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.API.Domain
@@ -23,13 +22,13 @@ namespace Identity.API.Domain
             _userRepository = userRepository;
         }
 
-        public async Task SignUp(User user, string password)
+        public async Task<bool> SignUp(User user, string password)
         {
             var existingUser = await _userManager.FindByNameAsync(user.Username);
             if (existingUser != null)
             {
-                _domainNotificationHandler.NotifyWithError("Já existe um usuário com este identificador");
-                return;
+                _domainNotificationHandler.Notify("Já existe um usuário com este identificador");
+                return false;
             }
 
             var createResult = _userManager
@@ -38,10 +37,13 @@ namespace Identity.API.Domain
             if (!createResult.Succeeded)
             {
                 foreach (var createError in createResult.Errors)
-                    _domainNotificationHandler.NotifyWithError(createError.Description);
+                    _domainNotificationHandler.Notify(createError.Description);
+
+                return false;
             }
 
             await _userRepository.Commit();
+            return true;
         }
     }
 }
