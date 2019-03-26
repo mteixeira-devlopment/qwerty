@@ -30,9 +30,6 @@ namespace Identity.API.Bus.Sagas
         {
             mapper.ConfigureMapping<ValidateUserCommand>(message => message.UserId)
                 .ToSaga(sagaData => sagaData.UserId);
-
-            mapper.ConfigureMapping<AccountInvalidatedEvent>(message => message.UserId)
-                .ToSaga(sagaData => sagaData.UserId);
         }
 
         public async Task Handle(ValidateUserCommand message, IMessageHandlerContext context)
@@ -42,20 +39,14 @@ namespace Identity.API.Bus.Sagas
 
             if (!signUp)
             {
-                await HandlerInvalidatedUser(user.Id);
+                await HandlerInvalidatedUser();
                 return;
             }
 
-            var validateAccountCommand = 
-                new ValidateAccountCommand(user.Id, message.FullName, message.BirthDate, message.Document);
-
-            await BusConfiguration
-                .BusEndpointInstance
-                .Send(validateAccountCommand)
-                .ConfigureAwait(false);
+            await HandlerAccountValidate(user.Id, message.FullName, message.BirthDate, message.Document);
         }
 
-        private async Task HandlerInvalidatedUser(Guid userId)
+        private async Task HandlerInvalidatedUser()
         {
             var invalidateReason = _domainNotificationHandler.GetFirst().ErrorMessage;
             var userInvalidatedEvent = new UserInvalidatedEvent(invalidateReason);
@@ -66,6 +57,17 @@ namespace Identity.API.Bus.Sagas
                 .ConfigureAwait(false);
 
             MarkAsComplete();
+        }
+
+        private async Task HandlerAccountValidate(Guid userId, string fullName, DateTime birthDate, string document)
+        {
+            var validateAccountCommand =
+                new ValidateAccountCommand(userId, fullName, birthDate, document);
+
+            await BusConfiguration
+                .BusEndpointInstance
+                .Send(validateAccountCommand)
+                .ConfigureAwait(false);
         }
 
         public Task Handle(AccountValidatedEvent message, IMessageHandlerContext context)
