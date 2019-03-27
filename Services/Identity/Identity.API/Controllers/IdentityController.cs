@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Bus.Commands;
+using Bus.Events;
 using Identity.API.Configurations;
 using Identity.API.Data.Repositories;
 using Identity.API.Domain;
@@ -21,6 +22,7 @@ namespace Identity.API.Controllers
     [ApiController]
     public class IdentityController : ApiController
     {
+        private readonly ISignUpService _signUpService;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly TokenConfigurations _tokenConfigurations;
@@ -29,12 +31,14 @@ namespace Identity.API.Controllers
 
         public IdentityController(
             IDomainNotificationHandler domainNotificationHandler,
+            ISignUpService signUpService,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             TokenConfigurations tokenConfigurations,
             CredentialConfigurations signingConfigurations,
             IUserRepository userRepository) : base(domainNotificationHandler)
         {
+            _signUpService = signUpService;
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenConfigurations = tokenConfigurations;
@@ -127,16 +131,28 @@ namespace Identity.API.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> SignUpUserAsync(SignUpUser model)
         {
+            var user = new User(model.Username);
+            var signUp = await _signUpService.SignUp(user, model.Password);
+
+            if (!signUp)
+            {
+                var invalidateReason = DomainNotificationHandler.GetFirst().ErrorMessage;
+                var userInvalidatedEvent = new UserInvalidatedEvent(invalidateReason);
+
+                await BusConfiguration
+                    .BusEndpointInstance
+                    .Publish(userInvalidatedEvent)
+                    .ConfigureAwait(false);
+
+                return OkResponse();
+            }
+
+            var validateAccountCommand =
+                new ValidateAccountCommand(user.Id, model.FullName, model.BirthDate, model.Document);
+
             await BusConfiguration
                 .BusEndpointInstance
-                .SendLocal<ValidateUserCommand>(message =>
-                {
-                    message.Username = model.Username;
-                    message.Password = model.Password;
-                    message.FullName = model.FullName;
-                    message.BirthDate = model.BirthDate;
-                    message.Document = model.Document;
-                })
+                .Send(validateAccountCommand)
                 .ConfigureAwait(false);
 
             return OkResponse();
