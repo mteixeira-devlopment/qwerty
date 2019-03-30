@@ -59,12 +59,13 @@ namespace Identity.API.Stores
 
         public Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _userRepository.Delete(user, cancellationToken);
+            return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _userRepository.FindAsync(new Guid(userId), cancellationToken);
         }
 
         public void Dispose()

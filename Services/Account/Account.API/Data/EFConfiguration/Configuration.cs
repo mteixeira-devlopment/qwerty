@@ -1,10 +1,29 @@
 ﻿using Account.API.Domain;
+using Account.API.Domain.Seed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using Acc = Account.API.Domain.Account;
 
 namespace Account.API.Data.EFConfiguration
 {
-    internal abstract class Configuration<TEntity> : IEntityTypeConfiguration<TEntity>
+    public class AccountConfiguration : Configuration<Acc>
+    {
+        public override void MapConfiguration(EntityTypeBuilder<Acc> builder)
+        {
+            builder.Property<Guid>("CustomerId")
+                .HasColumnName("id_customer")
+                .HasColumnType("VARCHAR(38)")
+                .HasField("_customerId")
+                .IsRequired();
+
+            builder.HasOne(acc => acc.Customer)
+                .WithMany()
+                .HasForeignKey("CustomerId");
+        }
+    }
+
+    public abstract class Configuration<TEntity> : IEntityTypeConfiguration<TEntity>
         where TEntity : Entity
     {
         private EntityTypeBuilder<TEntity> _builder;

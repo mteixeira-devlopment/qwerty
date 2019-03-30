@@ -136,26 +136,32 @@ namespace Identity.API.Controllers
 
             if (!signUp)
             {
-                var invalidateReason = DomainNotificationHandler.GetFirst().ErrorMessage;
-                var userInvalidatedEvent = new UserInvalidatedEvent(invalidateReason);
-
-                await BusConfiguration
-                    .BusEndpointInstance
-                    .Publish(userInvalidatedEvent)
-                    .ConfigureAwait(false);
-
+                await SignUpInvalidateUser();
                 return OkResponse();
             }
 
+            await SignUpValidateAccountCommand(model, user);
+            return OkResponse();
+        }
+
+        private async Task SignUpInvalidateUser()
+        {
+            var invalidateReason = DomainNotificationHandler.GetFirst().ErrorMessage;
+            var userInvalidatedEvent = new UserInvalidatedEvent(invalidateReason);
+
+            await BusConfiguration.BusEndpointInstance
+                .Publish(userInvalidatedEvent)
+                .ConfigureAwait(false);
+        }
+
+        private async Task SignUpValidateAccountCommand(SignUpUser model, User user)
+        {
             var validateAccountCommand =
                 new ValidateAccountCommand(user.Id, model.FullName, model.BirthDate, model.Document);
 
-            await BusConfiguration
-                .BusEndpointInstance
+            await BusConfiguration.BusEndpointInstance
                 .Send(validateAccountCommand)
                 .ConfigureAwait(false);
-
-            return OkResponse();
         }
     }
 }
