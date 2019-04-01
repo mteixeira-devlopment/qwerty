@@ -1,6 +1,8 @@
 ﻿using Account.API.Configurations;
+using Account.API.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +19,9 @@ namespace Account.API
         
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AccountContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("GooglePlatform")));
+
             services.ConfigureBus();
 
             services.AddMvc();

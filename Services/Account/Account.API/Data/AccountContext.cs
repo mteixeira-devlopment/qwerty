@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Account.API.Data.EFConfiguration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Account.API.Data
 {
@@ -11,7 +12,8 @@ namespace Account.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.ApplyConfiguration(new AccountConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerConfiguration());
         }
     }
 }

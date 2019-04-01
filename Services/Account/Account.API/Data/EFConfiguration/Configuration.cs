@@ -7,17 +7,35 @@ using Acc = Account.API.Domain.Account;
 
 namespace Account.API.Data.EFConfiguration
 {
+    public class CustomerConfiguration : Configuration<Customer>
+    {
+        public override void MapConfiguration(EntityTypeBuilder<Customer> customerConfiguration)
+        {
+            customerConfiguration.Property(c => c.FullName)
+                .HasColumnName("fullname")
+                .HasColumnType("VARCHAR(80)")
+                .IsRequired();
+
+            customerConfiguration.Property(c => c.BirthDate)
+                .HasColumnName("birthdate")
+                .HasColumnType("DATE")
+                .IsRequired();
+
+            customerConfiguration.OwnsOne(c => c.Document);
+        }
+    }
+
     public class AccountConfiguration : Configuration<Acc>
     {
-        public override void MapConfiguration(EntityTypeBuilder<Acc> builder)
+        public override void MapConfiguration(EntityTypeBuilder<Acc> accountConfiguration)
         {
-            builder.Property<Guid>("CustomerId")
+            accountConfiguration.Property<Guid>("CustomerId")
                 .HasColumnName("id_customer")
                 .HasColumnType("VARCHAR(38)")
                 .HasField("_customerId")
                 .IsRequired();
 
-            builder.HasOne(acc => acc.Customer)
+            accountConfiguration.HasOne(acc => acc.Customer)
                 .WithMany()
                 .HasForeignKey("CustomerId");
         }
