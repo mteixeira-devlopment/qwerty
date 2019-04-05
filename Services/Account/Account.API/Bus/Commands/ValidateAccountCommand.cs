@@ -1,5 +1,4 @@
 ﻿using System;
-using Account.API.Domain;
 
 // ReSharper disable once CheckNamespace
 namespace Bus.Commands

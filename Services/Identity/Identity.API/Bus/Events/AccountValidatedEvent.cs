@@ -1,8 +1,10 @@
-﻿// ReSharper disable once CheckNamespace
+﻿using System;
+
+// ReSharper disable once CheckNamespace
 namespace Bus.Events
 {
-    public class AccountValidatedEvent
+    public sealed class AccountValidatedEvent
     {
-
+        public Guid UserId { get; set; }
     }
 }

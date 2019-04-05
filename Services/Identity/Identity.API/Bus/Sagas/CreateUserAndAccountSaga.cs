@@ -1,14 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Bus.Commands;
-using Bus.Events;
-using Identity.API.Configurations;
-using Identity.API.Domain;
-using Identity.API.SharedKernel.Handlers;
-using Microsoft.AspNetCore.Mvc;
-using NServiceBus;
-
-namespace Identity.API.Bus.Sagas
+﻿namespace Identity.API.Bus.Sagas
 {
     //public class CreateUserAndAccountSaga : Saga<CreateUserAndAccountSagaData>,
     //    IAmStartedByMessages<ValidateUserCommand>,

@@ -19,7 +19,7 @@ namespace Account.API.Domain.Seed
 
         protected void Validate()
         {
-            _validationResult = base.Validate(_parent);
+            _validationResult = Validate(_parent);
             IsValid = _validationResult.IsValid;
         }
 

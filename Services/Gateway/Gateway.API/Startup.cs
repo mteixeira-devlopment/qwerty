@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Gateway.API.Configurations;
+using Gateway.API.Handlers;
 using Ocelot.Configuration.Creator;
 
 namespace Gateway.API
@@ -24,12 +24,30 @@ namespace Gateway.API
         {
             services.ConfigureProvider(Configuration);
 
+            services.AddCors(
+                options => options.AddPolicy("*", policy
+                    => policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()));
+
+            services.AddSignalR();
+
+            services.ConfigureBus();
+
             services.AddOcelot(Configuration);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseExceptionHandler(new ExceptionHandlerOptions
+            {
+                ExceptionHandler = new ExceptionHandler().Invoke
+            });
+
             var configuration = new OcelotPipelineConfiguration
             {
                 AuthorisationMiddleware = async (ctx, next) =>
@@ -43,9 +61,12 @@ namespace Gateway.API
                 }
             };
 
-            app.UseOcelot(configuration).Wait();
+            app.UseCors("*");
 
             app.UseAuthentication();
+
+            app.UseWebSockets();
+            app.UseOcelot(configuration).Wait();
 
             app.UseMvc();
         }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Bus.Commands;
 using Bus.Events;
 using Identity.API.Configurations;
-using Identity.API.Data.Repositories;
 using Identity.API.Domain;
-using Identity.API.SharedKernel.Handlers;
+using Identity.API.Domain.Handlers;
+using Identity.API.Domain.Services;
 using Identity.API.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -55,15 +55,15 @@ namespace Identity.API.Controllers
         {
             var user = await CheckIfExistsAsync(model.Username);
             if (user == null)
-                return OkResponse();
+                return OkOrUnprocessableResponse();
 
             var passwordIsChecked = await CheckPasswordAsync(user, model.Password);
             if (!passwordIsChecked)
-                return OkResponse();
+                return OkOrUnprocessableResponse();
 
             var token = GenerateToken(user);
            
-            return OkResponse(token);
+            return OkOrUnprocessableResponse(token);
         }
 
         private async Task<User> CheckIfExistsAsync(string userIdentity)
@@ -127,7 +127,7 @@ namespace Identity.API.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("signup")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(string), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> SignUpUserAsync(SignUpUser model)
         {
@@ -136,25 +136,27 @@ namespace Identity.API.Controllers
 
             if (!signUp)
             {
-                await SignUpInvalidateUser();
-                return OkResponse();
+                await PublishInvalidatedUser();
+                return OkOrUnprocessableResponse(DomainNotificationHandler.GetFirst().ErrorMessage);
             }
 
-            await SignUpValidateAccountCommand(model, user);
-            return OkResponse();
+            await SendValidateAccount(model, user);
+
+            var returnMessage = $"Obrigado, {model.FullName}. Aguarde enquanto analisamos sua documentação :)";
+            return CreatedResponse(returnMessage);
         }
 
-        private async Task SignUpInvalidateUser()
+        private async Task PublishInvalidatedUser()
         {
-            var invalidateReason = DomainNotificationHandler.GetFirst().ErrorMessage;
-            var userInvalidatedEvent = new UserInvalidatedEvent(invalidateReason);
+            var errors = DomainNotificationHandler.GetNotificationErrors();
+            var userInvalidatedEvent = new UserInvalidatedEvent(errors);
 
             await BusConfiguration.BusEndpointInstance
                 .Publish(userInvalidatedEvent)
                 .ConfigureAwait(false);
         }
 
-        private async Task SignUpValidateAccountCommand(SignUpUser model, User user)
+        private async Task SendValidateAccount(SignUpUser model, User user)
         {
             var validateAccountCommand =
                 new ValidateAccountCommand(user.Id, model.FullName, model.BirthDate, model.Document);

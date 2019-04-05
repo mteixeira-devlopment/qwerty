@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1",
-    "signature": "6a27ff40d0940a9220655625e3c23c26ef932eef"
+    "signature": "c53421bb2584b6bc0cc6f29de7495d92d901aa17"
   },
   "compilationOptions": {
     "defines": [
@@ -24,6 +24,7 @@
     ".NETCoreApp,Version=v2.1": {
       "Identity.API/1.0.0": {
         "dependencies": {
+          "FluentValidation": "8.2.0",
           "Microsoft.AspNetCore.App": "2.1.1",
           "Microsoft.AspNetCore.Razor.Design": "2.1.2",
           "Microsoft.NETCore.App": "2.1.0",
@@ -38,6 +39,20 @@
         },
         "compile": {
           "Identity.API.dll": {}
+        }
+      },
+      "FluentValidation/8.2.0": {
+        "dependencies": {
+          "System.ComponentModel.Annotations": "4.5.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/FluentValidation.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.2.0.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/FluentValidation.dll": {}
         }
       },
       "Microsoft.AspNetCore.Razor.Design/2.1.2": {},
@@ -3433,6 +3448,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "FluentValidation/8.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jSEifSJW4GqLURC8DDfIT3anwidrq4mxVTpJu4lD5MCzKHEp85/pAl/SUrsXzioq9JpJCNoNWYiSXPUdHlhYBw==",
+      "path": "fluentvalidation/8.2.0",
+      "hashPath": "fluentvalidation.8.2.0.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Razor.Design/2.1.2": {
       "type": "package",

@@ -1,5 +1,4 @@
-﻿using Bus.Commands;
-using Bus.Events;
+﻿using Bus.Events;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 
@@ -46,7 +45,6 @@ namespace Account.API.Configurations
         {
             conventions.DefiningCommandsAs(type => type.Namespace != null && type.Namespace.EndsWith("Commands"));
             conventions.DefiningEventsAs(type => type.Namespace != null && type.Namespace.EndsWith("Events"));
-            conventions.DefiningMessagesAs(type => type.Namespace != null && type.Namespace.EndsWith("Events"));
         }
 
         private static void ConfigureEndpoint(this EndpointConfiguration endpointConfiguration)
@@ -54,8 +52,8 @@ namespace Account.API.Configurations
             endpointConfiguration.UseSerialization<XmlSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
 
-            endpointConfiguration.SendFailedMessagesTo("error");
-            endpointConfiguration.AuditProcessedMessagesTo("audit");
+            endpointConfiguration.SendFailedMessagesTo("Qwerty.Log.Error");
+            endpointConfiguration.AuditProcessedMessagesTo("Qwerty.Log.Audit");
 
             endpointConfiguration.EnableInstallers();
         }

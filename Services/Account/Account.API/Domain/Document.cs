@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Account.API.Domain.Seed;
 
 namespace Account.API.Domain
 {
@@ -11,6 +12,7 @@ namespace Account.API.Domain
         public Document(string text)
         {
             Text = text;
+            Verified = false;
         }
 
         public void AddPhoto(string photo)

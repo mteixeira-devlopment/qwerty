@@ -9,11 +9,5 @@ namespace Identity.API.ViewModels
 
         [Required]
         public string Password { get; set; }
-
-        public SignInUser(string userIdentity, string password)
-        {
-            Username = userIdentity;
-            Password = password;
-        }
     }
 }
