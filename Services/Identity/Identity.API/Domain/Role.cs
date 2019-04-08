@@ -1,4 +1,6 @@
-﻿namespace Identity.API.Domain
+﻿using Identity.API.Domain.Seed;
+
+namespace Identity.API.Domain
 {
     public sealed class Role : Entity
     {

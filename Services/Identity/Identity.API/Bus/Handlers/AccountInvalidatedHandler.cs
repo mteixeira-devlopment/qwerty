@@ -1,7 +1,5 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Bus.Events;
-using Identity.API.Data.Repositories;
 using Identity.API.Domain;
 using Microsoft.AspNetCore.Identity;
 using NServiceBus;

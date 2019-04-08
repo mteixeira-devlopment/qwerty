@@ -1,9 +1,11 @@
 ﻿using Identity.API.Configurations;
-using Identity.API.Data;
-using Identity.API.Data.Repositories;
 using Identity.API.Domain;
+using Identity.API.Domain.Handlers;
+using Identity.API.Domain.Services;
+using Identity.API.Infrastructure.Data;
+using Identity.API.Infrastructure.Data.Repositories;
+using Identity.API.Infrastructure.Stores;
 using Identity.API.SharedKernel.Handlers;
-using Identity.API.Stores;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +32,7 @@ namespace Identity.API
                 "v1", new Info { Title = "Identity Api", Version = "v1" }));
             
             services.AddDbContext<IdentityContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("GooglePlatform")));
+                options.UseSqlServer(Configuration.GetConnectionString("STF")));
 
             services.ConfigureIdentity(Configuration);
 
@@ -51,9 +53,6 @@ namespace Identity.API
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
-            else app.UseHsts();
-
             app.UseExceptionHandler(new ExceptionHandlerOptions
             {
                 ExceptionHandler = new ExceptionHandler().Invoke
@@ -61,8 +60,7 @@ namespace Identity.API
 
             app.UseSwagger();
 
-            app.UseSwaggerUI(c
-                => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Api"));
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Api"));
     
             app.UseMvc();
         }

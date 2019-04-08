@@ -16,7 +16,7 @@ namespace Account.API.Domain.Validations
                 .WithMessage("É necessário ter 18 anos ou mais para se cadastrar.");
 
             RuleFor(acc => account.Customer.Document)
-                .Must(document => document.Text.Length == 18)
+                .Must(document => document.Text.Length == 11)
                 .WithMessage("O documento não está no padrão correto.");
 
             Validate();

@@ -9,7 +9,7 @@ namespace Identity.API.Configurations
     {
         public static IEndpointInstance BusEndpointInstance { get; private set; }
 
-        public static void ConfigureBus(this IServiceCollection service)
+        public static void ConfigureBus(this IServiceCollection services)
         {
             var endpointConfiguration = new EndpointConfiguration("Qwerty.Api.Identity");
 
@@ -24,7 +24,7 @@ namespace Identity.API.Configurations
 
             endpointConfiguration.ConfigureEndpoint();
          
-            endpointConfiguration.UseContainer<ServicesBuilder>(customizations => customizations.ExistingServices(service));
+            endpointConfiguration.UseContainer<ServicesBuilder>(customizations => customizations.ExistingServices(services));
 
             BusEndpointInstance = Endpoint.Start(endpointConfiguration).Result;
         }
@@ -39,14 +39,14 @@ namespace Identity.API.Configurations
         private static void ConfigureRouting(this RoutingSettings<RabbitMQTransport> routing)
         {
             routing.RouteToEndpoint(typeof(ValidateAccountCommand), "Qwerty.Api.Account");
-            routing.RouteToEndpoint(typeof(UserInvalidatedEvent), "Qwerty.Api.Identity");
+            routing.RouteToEndpoint(typeof(UserInvalidatedEvent), "Qwerty.Api.Gateway");
         }
 
         private static void ConfigureConventions(this ConventionsBuilder conventions)
         {
             conventions.DefiningCommandsAs(type => type.Namespace != null && type.Namespace.EndsWith("Commands"));
             conventions.DefiningEventsAs(type => type.Namespace != null && type.Namespace.EndsWith("Events"));
-            conventions.DefiningMessagesAs(type => type.Namespace != null && type.Namespace.EndsWith("Events"));
+            conventions.DefiningMessagesAs(type => type.Namespace != null && type.Namespace.EndsWith("Messages"));
         }
 
         private static void ConfigureEndpoint(this EndpointConfiguration endpointConfiguration)
@@ -54,8 +54,8 @@ namespace Identity.API.Configurations
             endpointConfiguration.UseSerialization<XmlSerializer>();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
 
-            endpointConfiguration.SendFailedMessagesTo("error");
-            endpointConfiguration.AuditProcessedMessagesTo("audit");
+            endpointConfiguration.SendFailedMessagesTo("Qwerty.Log.Error");
+            endpointConfiguration.AuditProcessedMessagesTo("Qwerty.Log.Audit");
 
             endpointConfiguration.EnableInstallers();
         }

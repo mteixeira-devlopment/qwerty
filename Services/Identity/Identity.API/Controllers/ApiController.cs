@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Identity.API.SharedKernel.Handlers;
+using Identity.API.Domain.Handlers;
 using Identity.API.SharedKernel.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ namespace Identity.API.Controllers
             DomainNotificationHandler = domainNotificationHandler;
         }
 
-        protected IActionResult OkResponse(object result = null)
+        protected IActionResult OkOrUnprocessableResponse(object result = null)
         {
             if (IsValidRequest())
                 return Ok(new SuccessResponse(result));
@@ -25,7 +25,13 @@ namespace Identity.API.Controllers
                 .Select(n => n.ErrorMessage)
                 .ToList();
 
-            return Ok(new ErrorResponse(errors, 200));
+            return UnprocessableEntity(new ErrorResponse(errors, 422));
+        }
+
+        protected IActionResult CreatedResponse(object result)
+        {
+            var uri = Request.Path.Value;
+            return Created(uri, new SuccessResponse(result));
         }
 
         protected IActionResult BadRequestResponse(string requestError)
