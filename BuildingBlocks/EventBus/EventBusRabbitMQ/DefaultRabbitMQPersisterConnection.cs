@@ -8,10 +8,6 @@ using RabbitMQ.Client.Exceptions;
 
 namespace EventBusRabbitMQ
 {
-    public class EventBusRabbitMQ : IEventBus, IDisposable
-    {
-
-    }
 
     public class DefaultRabbitMQPersisterConnection : IRabbitMQPersisterConnection
     {
@@ -53,20 +49,24 @@ namespace EventBusRabbitMQ
 
                 if (IsConnected)
                 {
-                    _connection.ConnectionShutdown += OnConnectionShutdown;
-                    _connection.CallbackException += OnCallbackException;
-                    _connection.ConnectionBlocked += OnConnectionBlocked;
-
-                    _logger.LogInformation(
-                        $"RabbitMQ persistent connection acquired a connection " +
-                        $"{_connection.Endpoint.HostName} and is subscribed to failure events.");
-
+                    HandlerConnectedPersister();
                     return true;
                 }
 
                 _logger.LogCritical($"FATAL ERROR: RabbitMQ connections could not be created and opened.");
                 return false;
             }
+        }
+
+        private void HandlerConnectedPersister()
+        {
+            _connection.ConnectionShutdown += OnConnectionShutdown;
+            _connection.CallbackException += OnCallbackException;
+            _connection.ConnectionBlocked += OnConnectionBlocked;
+
+            _logger.LogInformation(
+                $"RabbitMQ persistent connection acquired a connection " +
+                $"{_connection.Endpoint.HostName} and is subscribed to failure events.");
         }
 
         public void Dispose()
