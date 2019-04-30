@@ -3,7 +3,7 @@ using Identity.API.Domain.Models;
 
 namespace Identity.API.Domain.Handlers
 {
-    public interface IDomainNotificationHandler
+    public interface INotificationHandler
     {
         DomainNotification GetFirst();
         List<DomainNotification> GetNotifications();

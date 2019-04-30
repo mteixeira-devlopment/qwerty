@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -8,7 +9,6 @@ using RabbitMQ.Client.Exceptions;
 
 namespace EventBusRabbitMQ
 {
-
     public class DefaultRabbitMQPersisterConnection : IRabbitMQPersisterConnection
     {
         private readonly IConnectionFactory _connectionFactory;
@@ -18,7 +18,15 @@ namespace EventBusRabbitMQ
         private IConnection _connection;
         private bool _disposed;
 
-        object sync_root = new object();
+        private readonly object sync_root = new object();
+
+        public DefaultRabbitMQPersisterConnection(
+            IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQPersisterConnection> logger, int retryCount = 5)
+        {
+            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _retryCount = retryCount;
+        }
 
         public bool IsConnected => _connection != null && _connection.IsOpen && !_disposed;
 
@@ -71,7 +79,18 @@ namespace EventBusRabbitMQ
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            if (!_disposed) return;
+
+            _disposed = true;
+
+            try
+            {
+                _connection.Dispose();
+            }
+            catch (IOException exception)
+            {
+                _logger.LogCritical(exception.ToString());
+            }
         }
 
         private void OnConnectionBlocked(object sender, ConnectionBlockedEventArgs e)

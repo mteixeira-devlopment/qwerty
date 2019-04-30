@@ -4,11 +4,11 @@ using Identity.API.Domain.Models;
 
 namespace Identity.API.Domain.Handlers
 {
-    public sealed class DomainNotificationHandler : IDomainNotificationHandler
+    public sealed class NotificationHandler : INotificationHandler
     {
         private readonly List<DomainNotification> _notifications;
 
-        public DomainNotificationHandler()
+        public NotificationHandler()
         {
             _notifications = new List<DomainNotification>();
         }

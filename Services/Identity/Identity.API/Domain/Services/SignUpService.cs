@@ -6,12 +6,12 @@ namespace Identity.API.Domain.Services
 {
     public class SignUpService : ISignUpService
     {
-        private readonly IDomainNotificationHandler _domainNotificationHandler;
+        private readonly INotificationHandler _domainNotificationHandler;
         private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
 
         public SignUpService(
-            IDomainNotificationHandler domainNotificationHandler,
+            INotificationHandler domainNotificationHandler,
             UserManager<User> userManager, 
             IUserRepository userRepository)
         {

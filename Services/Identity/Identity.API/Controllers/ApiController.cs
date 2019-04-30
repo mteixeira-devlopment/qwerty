@@ -8,9 +8,9 @@ namespace Identity.API.Controllers
 {
     public abstract class ApiController : Controller
     {
-        protected readonly IDomainNotificationHandler DomainNotificationHandler;
+        protected readonly INotificationHandler DomainNotificationHandler;
 
-        protected ApiController(IDomainNotificationHandler domainNotificationHandler)
+        protected ApiController(INotificationHandler domainNotificationHandler)
         {
             DomainNotificationHandler = domainNotificationHandler;
         }

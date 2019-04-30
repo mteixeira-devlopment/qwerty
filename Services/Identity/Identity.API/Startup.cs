@@ -36,7 +36,7 @@ namespace Identity.API
 
             services.ConfigureIdentity(Configuration);
 
-            services.AddScoped<IDomainNotificationHandler, DomainNotificationHandler>();
+            services.AddScoped<INotificationHandler, NotificationHandler>();
 
             services.AddTransient<IUserStore<User>, UserStores>();
             services.AddTransient<IRoleStore<Role>, RoleStores>();
@@ -46,7 +46,8 @@ namespace Identity.API
 
             services.AddTransient<ISignUpService, SignUpService>();
 
-            services.ConfigureBus();
+            services.ConfigureEventBus(Configuration);
+            services.ConfigureRabbitMQEventBus(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

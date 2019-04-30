@@ -3,11 +3,16 @@ using Account.API.Domain;
 using Account.API.Infrastructure.Data;
 using Account.API.Infrastructure.Data.Repositories;
 using Account.API.SharedKernel.Handlers;
+using Autofac;
+using Autofac.Core.Lifetime;
+using EventBusRabbitMQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Account.API
@@ -31,7 +36,12 @@ namespace Account.API
 
             services.AddTransient<IAccountRepository, AccountRepository>();
 
-            services.ConfigureBus();
+            // services.ConfigureBus();
+            
+            services.ConfigureRabbitMQEventBus(Configuration);
+            services.ConfigureEventBus(Configuration);
+
+            services.AddTransient<ILifetimeScope, LifetimeScope>();
 
             services.AddMvc();
         }
@@ -43,8 +53,9 @@ namespace Account.API
                 ExceptionHandler = new ExceptionHandler().Invoke
             });
 
-            app.UseSwagger();
+            app.ConfigureEventBusFromApp();
 
+            app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Account Api"));
 
             app.UseMvc();
