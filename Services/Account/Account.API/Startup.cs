@@ -1,18 +1,18 @@
-﻿using Account.API.Configurations;
+﻿using System;
+using Account.API.Configurations;
 using Account.API.Domain;
 using Account.API.Infrastructure.Data;
 using Account.API.Infrastructure.Data.Repositories;
 using Account.API.SharedKernel.Handlers;
 using Autofac;
 using Autofac.Core.Lifetime;
-using EventBusRabbitMQ;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Account.API
@@ -26,8 +26,11 @@ namespace Account.API
 
         public IConfiguration Configuration { get; }
         
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             services.AddSwaggerGen(c => c.SwaggerDoc(
                 "v1", new Info { Title = "Account Api", Version = "v1" }));
 
@@ -35,15 +38,14 @@ namespace Account.API
                 options.UseSqlServer(Configuration.GetConnectionString("STF")));
 
             services.AddTransient<IAccountRepository, AccountRepository>();
-
-            // services.ConfigureBus();
             
             services.ConfigureRabbitMQEventBus(Configuration);
             services.ConfigureEventBus(Configuration);
 
-            services.AddTransient<ILifetimeScope, LifetimeScope>();
+            var container = new ContainerBuilder();
+            container.Populate(services);
 
-            services.AddMvc();
+            return new AutofacServiceProvider(container.Build());
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

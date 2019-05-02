@@ -1,21 +1,9 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
-using Identity.API.Application.Handlers;
-using Identity.API.Configurations;
-using Identity.API.Domain;
+﻿using System.Threading.Tasks;
 using Identity.API.Domain.Commands;
 using Identity.API.Domain.Handlers;
-using Identity.API.Domain.Services;
-using Identity.API.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.API.Controllers
 {

@@ -6,11 +6,11 @@ using Autofac;
 using EventBus;
 using EventBus.Abstractions;
 using EventBus.Events;
+using EventBus.Extensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
-using Polly.Retry;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
@@ -23,7 +23,7 @@ namespace EventBusRabbitMQ
 
         private readonly IRabbitMQPersisterConnection _persister;
         private readonly ILogger<EventBusRabbitMQ> _logger;
-        private readonly IEventBusSubscriptionManager _subsscriptionManager;
+        private readonly IEventBusSubscriptionManager _subscriptionManager;
         private readonly ILifetimeScope _autofac;
 
         private readonly string AUTOFAC_SCOPE_NAME = "qwerty_event_bus";
@@ -42,13 +42,30 @@ namespace EventBusRabbitMQ
         {
             _persister = persister ?? throw new ArgumentNullException(nameof(persister));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _subsscriptionManager = subscriptionManager ?? new InMemoryEventBusSubscriptionsManager();
+            _subscriptionManager = subscriptionManager ?? new InMemoryEventBusSubscriptionsManager();
             _autofac = autofac;
 
             _queueName = queueName;
             _retryCount = retryCount;
 
             _consumerChannel = CreateConsumerChannel();
+
+            _subscriptionManager.OnEventRemoved += SubsManager_OnEventRemoved;
+        }
+
+        private void SubsManager_OnEventRemoved(object sender, string eventName)
+        {
+            if (!_persister.IsConnected) _persister.TryConnect();
+
+            using (var channel = _persister.CreateModel())
+            {
+                channel.QueueUnbind(_queueName, BROKER_NAME, eventName);
+
+                if (!_subscriptionManager.IsEmpty) return;
+
+                _queueName = string.Empty;
+                _consumerChannel.Close();
+            }
         }
 
         private IModel CreateConsumerChannel()
@@ -58,7 +75,7 @@ namespace EventBusRabbitMQ
 
             var channel = _persister.CreateModel();
 
-            channel.ExchangeDeclare(_queueName, "direct");
+            channel.ExchangeDeclare(BROKER_NAME, "direct");
             channel.QueueDeclare(_queueName, true, false, false, null);
             channel.CallbackException += (sender, ea) =>
             {
@@ -112,7 +129,7 @@ namespace EventBusRabbitMQ
 
             DoInternalSubscription(eventName);
 
-            _subsscriptionManager.AddDynamicSubscription<T>(eventName);
+            _subscriptionManager.AddDynamicSubscription<T>(eventName);
             StartBasicConsume();
         }
 
@@ -120,18 +137,18 @@ namespace EventBusRabbitMQ
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = _subsscriptionManager.GetEventKey<T>();
+            var eventName = _subscriptionManager.GetEventKey<T>();
             DoInternalSubscription(eventName);
 
-            _logger.LogInformation($"Subscription to event {eventName} with {typeof(TH).GetGenericTypeDefinition()}");
+            _logger.LogInformation($"Subscribing to event {eventName} with {typeof(TH).GetGenericTypeName()}");
 
-            _subsscriptionManager.AddSubscription<T, TH>();
+            _subscriptionManager.AddSubscription<T, TH>();
             StartBasicConsume();
         }
 
         private void DoInternalSubscription(string eventName)
         {
-            var containsKey = _subsscriptionManager.HasSubscriptionsForEvent(eventName);
+            var containsKey = _subscriptionManager.HasSubscriptionsForEvent(eventName);
             if (containsKey) return;
 
             if (!_persister.IsConnected)
@@ -143,17 +160,17 @@ namespace EventBusRabbitMQ
 
         public void UnsubscribeDynamic<T>(string eventName) where T : IDynamicIntegrationEventHandler
         {
-            _subsscriptionManager.RemoveDynamicSubscription<T>(eventName);
+            _subscriptionManager.RemoveDynamicSubscription<T>(eventName);
         }
 
         public void Unsubscribe<T, TH>()
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = _subsscriptionManager.GetEventKey<T>();
+            var eventName = _subscriptionManager.GetEventKey<T>();
 
             _logger.LogInformation($"Unsubscriibing from event {eventName}");
-            _subsscriptionManager.RemoveSubscription<T, TH>();
+            _subscriptionManager.RemoveSubscription<T, TH>();
         }
 
         private void StartBasicConsume()
@@ -163,6 +180,8 @@ namespace EventBusRabbitMQ
                 var consumer = new AsyncEventingBasicConsumer(_consumerChannel);
 
                 consumer.Received += ConsumerReceived;
+
+                _consumerChannel.BasicConsume(_queueName, false, consumer);
             }
         }
 
@@ -187,11 +206,11 @@ namespace EventBusRabbitMQ
 
         private async Task ProcessEvent(string eventName, string message)
         {
-            if (_subsscriptionManager.HasSubscriptionsForEvent(eventName))
+            if (_subscriptionManager.HasSubscriptionsForEvent(eventName))
             {
                 using (var scope = _autofac.BeginLifetimeScope(AUTOFAC_SCOPE_NAME))
                 {
-                    var subscriptions = _subsscriptionManager.GetHandlersForEvent(eventName);
+                    var subscriptions = _subscriptionManager.GetHandlersForEvent(eventName);
                     foreach (var subscription in subscriptions)
                     {
                         if (subscription.IsDynamic)
@@ -204,7 +223,7 @@ namespace EventBusRabbitMQ
                         }
                         else
                         {
-                            var eventType = _subsscriptionManager.GetEventTypeByName(eventName);
+                            var eventType = _subscriptionManager.GetEventTypeByName(eventName);
 
                             var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
 
@@ -223,7 +242,7 @@ namespace EventBusRabbitMQ
         {
             _consumerChannel?.Dispose();
 
-            _subsscriptionManager.Clear();
+            _subscriptionManager.Clear();
         }
     }
 }

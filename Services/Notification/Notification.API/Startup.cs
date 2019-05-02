@@ -1,10 +1,8 @@
-﻿using Account.API.Configurations;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Notification.API.Configurations;
 using Notification.API.Domain;
 using Notification.API.Hubs;
 using Notification.API.Infrastructure.Data;
@@ -43,8 +41,6 @@ namespace Notification.API
                         .AllowCredentials()));
 
             services.AddSignalR();
-
-            services.ConfigureBus();
 
             services.AddMvc();
         }

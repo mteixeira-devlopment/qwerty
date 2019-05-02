@@ -33,7 +33,6 @@ namespace Account.API.Configurations
                     retryCount = int.Parse(eventBusConnectionStrings.retryCount);
 
                 return new DefaultRabbitMQPersisterConnection(factory, logger, retryCount);
-
             });
         }
 

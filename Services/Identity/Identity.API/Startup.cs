@@ -1,7 +1,12 @@
-﻿using Identity.API.Configurations;
+﻿using System;
+using System.Reflection;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Identity.API.Configurations;
 using Identity.API.Domain;
 using Identity.API.Domain.Handlers;
 using Identity.API.Domain.Services;
+using Identity.API.Infrastructure.AutofacModules;
 using Identity.API.Infrastructure.Data;
 using Identity.API.Infrastructure.Data.Repositories;
 using Identity.API.Infrastructure.Stores;
@@ -26,8 +31,11 @@ namespace Identity.API
 
         public IConfiguration Configuration { get; }
         
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             services.AddSwaggerGen(c => c.SwaggerDoc(
                 "v1", new Info { Title = "Identity Api", Version = "v1" }));
             
@@ -49,7 +57,12 @@ namespace Identity.API
             services.ConfigureEventBus(Configuration);
             services.ConfigureRabbitMQEventBus(Configuration);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            var container = new ContainerBuilder();
+            container.Populate(services);
+
+            container.RegisterModule(new MediatorModule());
+
+            return new AutofacServiceProvider(container.Build());
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

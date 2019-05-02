@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventBus.Events;
+using MediatR;
 
 namespace Identity.API.Application.IntegrationEvents.Events
 {

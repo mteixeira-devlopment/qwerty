@@ -34,8 +34,6 @@ namespace Gateway.API
 
             services.AddSignalR();
 
-            services.ConfigureBus();
-
             services.AddOcelot(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

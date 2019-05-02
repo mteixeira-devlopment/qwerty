@@ -11,6 +11,19 @@
           "lib/netstandard2.0/Autofac.dll": {}
         }
       },
+      "Autofac.Extensions.DependencyInjection/4.4.0": {
+        "type": "package",
+        "dependencies": {
+          "Autofac": "4.9.1",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "2.1.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Autofac.Extensions.DependencyInjection.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Autofac.Extensions.DependencyInjection.dll": {}
+        }
+      },
       "FluentValidation/8.2.0": {
         "type": "package",
         "dependencies": {
@@ -4652,6 +4665,22 @@
         "lib/netstandard2.0/Autofac.dll",
         "lib/netstandard2.0/Autofac.pdb",
         "lib/netstandard2.0/Autofac.xml"
+      ]
+    },
+    "Autofac.Extensions.DependencyInjection/4.4.0": {
+      "sha512": "XO9Zk1zIUv9FyuGg9biGlGTPrSamdZKSZ+lHGTxnOaKkTmW1iWP276nlQ/l2V3XoVk86+SHyRnzH5MmhULGamg==",
+      "type": "package",
+      "path": "autofac.extensions.dependencyinjection/4.4.0",
+      "files": [
+        ".signature.p7s",
+        "autofac.extensions.dependencyinjection.4.4.0.nupkg.sha512",
+        "autofac.extensions.dependencyinjection.nuspec",
+        "lib/netstandard1.1/Autofac.Extensions.DependencyInjection.dll",
+        "lib/netstandard1.1/Autofac.Extensions.DependencyInjection.pdb",
+        "lib/netstandard1.1/Autofac.Extensions.DependencyInjection.xml",
+        "lib/netstandard2.0/Autofac.Extensions.DependencyInjection.dll",
+        "lib/netstandard2.0/Autofac.Extensions.DependencyInjection.pdb",
+        "lib/netstandard2.0/Autofac.Extensions.DependencyInjection.xml"
       ]
     },
     "FluentValidation/8.2.0": {
@@ -12238,6 +12267,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
+      "Autofac.Extensions.DependencyInjection >= 4.4.0",
       "EventBus >= 1.0.0",
       "EventBusRabbitMQ >= 1.0.0",
       "FluentValidation >= 8.2.0",
@@ -12296,6 +12326,10 @@
     "frameworks": {
       "netcoreapp2.1": {
         "dependencies": {
+          "Autofac.Extensions.DependencyInjection": {
+            "target": "Package",
+            "version": "[4.4.0, )"
+          },
           "FluentValidation": {
             "target": "Package",
             "version": "[8.2.0, )"
