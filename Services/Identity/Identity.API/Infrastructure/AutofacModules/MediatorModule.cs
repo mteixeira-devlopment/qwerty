@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Autofac;
-using Identity.API.Application.Handlers;
+using Identity.API.Application.Commands;
+using Identity.API.Application.Commands.Handlers;
 using MediatR;
 
 namespace Identity.API.Infrastructure.AutofacModules
@@ -15,6 +16,10 @@ namespace Identity.API.Infrastructure.AutofacModules
             
             builder
                 .RegisterAssemblyTypes(typeof(CreateUserCommandHandler).GetTypeInfo().Assembly)
+                .AsClosedTypesOf(typeof(IRequestHandler<,>));
+
+            builder
+                .RegisterAssemblyTypes(typeof(CancelUserCommandHandler).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IRequestHandler<,>));
 
             builder.Register<ServiceFactory>(context =>

@@ -4,13 +4,13 @@ namespace EventBus.Events
 {
     public class IntegrationEvent
     {
+        public Guid EventId { get; }
+        public DateTime CreationDate { get; }
+
         public IntegrationEvent()
         {
-            Id = Guid.NewGuid();
+            EventId = Guid.NewGuid();
             CreationDate = DateTime.UtcNow;
         }
-
-        public Guid Id { get; }
-        public DateTime CreationDate { get; }
     }
 }

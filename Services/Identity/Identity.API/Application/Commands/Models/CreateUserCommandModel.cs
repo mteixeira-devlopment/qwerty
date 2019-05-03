@@ -1,12 +1,10 @@
 ﻿using System;
 using MediatR;
 
-namespace Identity.API.Domain.Commands
+namespace Identity.API.Application.Commands.Models
 {
     public sealed class CreateUserCommandModel : IRequest<bool>
     {
-        public Guid UserId { get; private set; }
-
         public string Username { get; private set; }
         public string Password { get; private set; }
 

@@ -90,8 +90,7 @@ namespace EventBusRabbitMQ
 
         public void Publish(IntegrationEvent @event)
         {
-            if (!_persister.IsConnected)
-                _persister.TryConnect();
+            if (!_persister.IsConnected) _persister.TryConnect();
 
             var policy = Policy.Handle<BrokerUnreachableException>()
                 .Or<SocketException>()
@@ -101,7 +100,7 @@ namespace EventBusRabbitMQ
                     (ex, time) 
                         => _logger.LogWarning(
                             ex, 
-                            $"Could not publish event: {@event.Id} after {time.TotalSeconds:N1}s", 
+                            $"Could not publish event: {@event.EventId} after {time.TotalSeconds:N1}s", 
                             ex.Message));
 
             using (var channel = _persister.CreateModel())

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Identity.API.Domain.Commands;
+using Identity.API.Application.Commands;
+using Identity.API.Application.Commands.Models;
 using Identity.API.Domain.Handlers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,7 @@ namespace Identity.API.Controllers
         public async Task<IActionResult> SignUpUserAsync([FromBody] CreateUserCommandModel model)
         {
             var result = await _mediator.Send(model);
-            return Ok(result);
+            return ReplyOkOrUnprocessable(result);
         }
 
         //[AllowAnonymous]

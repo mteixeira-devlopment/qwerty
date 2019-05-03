@@ -35,7 +35,13 @@ namespace EventBusRabbitMQ
             if (!IsConnected)
                 throw new InvalidOperationException("No RabbitMQ connection are available to perform this action");
 
-            return _connection.CreateModel();
+            try
+            {
+                return _connection.CreateModel();
+            }
+            catch (Exception ex) {
+                throw ex;
+            }
         }
 
         public bool TryConnect()

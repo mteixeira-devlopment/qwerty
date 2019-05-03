@@ -8,19 +8,19 @@ namespace Identity.API.Controllers
 {
     public abstract class ApiController : Controller
     {
-        protected readonly INotificationHandler DomainNotificationHandler;
+        protected readonly INotificationHandler NotificationHandler;
 
-        protected ApiController(INotificationHandler domainNotificationHandler)
+        protected ApiController(INotificationHandler notificationHandler)
         {
-            DomainNotificationHandler = domainNotificationHandler;
+            NotificationHandler = notificationHandler;
         }
 
-        protected IActionResult OkOrUnprocessableResponse(object result = null)
+        protected IActionResult ReplyOkOrUnprocessable(object result = null)
         {
             if (IsValidRequest())
                 return Ok(new SuccessResponse(result));
 
-            var errors = DomainNotificationHandler
+            var errors = NotificationHandler
                 .GetNotifications()
                 .Select(n => n.ErrorMessage)
                 .ToList();
@@ -28,23 +28,23 @@ namespace Identity.API.Controllers
             return UnprocessableEntity(new ErrorResponse(errors, 422));
         }
 
-        protected IActionResult CreatedResponse(object result)
+        protected IActionResult ReplyCreated(object result)
         {
             var uri = Request.Path.Value;
             return Created(uri, new SuccessResponse(result));
         }
 
-        protected IActionResult BadRequestResponse(string requestError)
+        protected IActionResult ReplyBadRequest(string requestError)
         {
             var errors = new List<string> { requestError };
-            var responseStatusCode = Response.StatusCode;
+            var responseStatusCode = 400;
 
             return BadRequest(new ErrorResponse(errors, responseStatusCode));
         }
 
         private bool IsValidRequest()
         {
-            return !DomainNotificationHandler.HasNotifications();
+            return !NotificationHandler.HasNotifications();
         }
     }
 }

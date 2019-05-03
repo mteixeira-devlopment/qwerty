@@ -1,19 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using EventBus.Events;
 using MediatR;
 
 namespace Identity.API.Application.IntegrationEvents.Events
 {
+    public class UserCreatedIntegrationEvent : IntegrationEvent
+    {
+        public Guid UserId { get; private set; }
+        public string CreatedMessage { get; private set; }
+
+        public UserCreatedIntegrationEvent(Guid userId, string createdMessage)
+        {
+            UserId = userId;
+            CreatedMessage = createdMessage;
+        }
+    }
+
     public class UserValidatedIntegrationEvent : IntegrationEvent
     {
-        public Guid UserId { get; set; }
+        public Guid UserId { get; private set; }
 
-        public string FullName { get; set; }
-        public DateTime BirthDate { get; set; }
-        public string Document { get; set; }
+        public string FullName { get; private set; }
+        public DateTime BirthDate { get; private set; }
+        public string Document { get; private set; }
 
         public UserValidatedIntegrationEvent(Guid userId, string fullName, DateTime birthDate, string document)
         {

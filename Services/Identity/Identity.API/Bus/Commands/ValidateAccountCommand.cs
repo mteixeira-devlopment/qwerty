@@ -1,7 +1,7 @@
 ﻿using System;
 
 // ReSharper disable once CheckNamespace
-namespace Bus.Commands
+namespace Identity.API.Bus.Commands
 {
     public sealed class ValidateAccountCommand
     {

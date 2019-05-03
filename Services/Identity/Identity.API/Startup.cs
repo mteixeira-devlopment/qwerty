@@ -72,6 +72,8 @@ namespace Identity.API
                 ExceptionHandler = new ExceptionHandler().Invoke
             });
 
+            app.ConfigureEventBusFromApp();
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Api"));

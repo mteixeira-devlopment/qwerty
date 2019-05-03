@@ -2,6 +2,9 @@
 using EventBus;
 using EventBus.Abstractions;
 using EventBusRabbitMQ;
+using Identity.API.Application.IntegrationEvents.EventHandlers;
+using Identity.API.Application.IntegrationEvents.Events;
+using Identity.API.Bus.Events;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,11 +36,15 @@ namespace Identity.API.Configurations
             });
 
             services.AddSingleton<IEventBusSubscriptionManager, InMemoryEventBusSubscriptionsManager>();
+
+            services.AddTransient<AccountInvalidatedIntegrationEventHandler>();
         }
 
         public static void ConfigureEventBusFromApp(this IApplicationBuilder app)
         {
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+
+            eventBus.Subscribe<AccountInvalidatedIntegrationEvent, AccountInvalidatedIntegrationEventHandler>();
         }
     }
 }

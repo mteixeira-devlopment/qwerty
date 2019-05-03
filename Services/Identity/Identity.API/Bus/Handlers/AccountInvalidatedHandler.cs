@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Bus.Events;
 using Identity.API.Domain;
 using Microsoft.AspNetCore.Identity;
 

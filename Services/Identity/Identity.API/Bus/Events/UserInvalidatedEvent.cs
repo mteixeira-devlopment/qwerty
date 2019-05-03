@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 // ReSharper disable once CheckNamespace
-namespace Bus.Events
+namespace Identity.API.Bus.Events
 {
     public sealed class UserInvalidatedEvent
     {
