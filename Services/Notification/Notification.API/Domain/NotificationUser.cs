@@ -1,5 +1,5 @@
 ﻿using System;
-using Notification.API.Domain.Seed;
+using SharedKernel.Seed;
 
 namespace Notification.API.Domain
 {

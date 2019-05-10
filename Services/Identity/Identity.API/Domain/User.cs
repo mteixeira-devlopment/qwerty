@@ -1,4 +1,4 @@
-﻿using Identity.API.Domain.Seed;
+﻿using SharedKernel.Seed;
 
 namespace Identity.API.Domain
 {

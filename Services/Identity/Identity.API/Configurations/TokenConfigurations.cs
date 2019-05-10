@@ -12,6 +12,9 @@
         /// </summary>
         public string Issuer { get; set; }
 
-        public int Seconds { get; set; }
+        /// <summary>
+        /// Tempo em estado válido em segundos do token após ser gerado
+        /// </summary>
+        public int SecondsValid { get; set; }
     }
 }

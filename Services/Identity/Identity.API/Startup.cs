@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Identity.API.Application.IntegrationEvents.EventHandlers;
 using Identity.API.Configurations;
 using Identity.API.Domain;
-using Identity.API.Domain.Handlers;
-using Identity.API.Domain.Services;
 using Identity.API.Infrastructure.AutofacModules;
 using Identity.API.Infrastructure.Data;
 using Identity.API.Infrastructure.Data.Repositories;
 using Identity.API.Infrastructure.Stores;
-using Identity.API.SharedKernel.Handlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel.Configurations;
+using SharedKernel.Handlers;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Identity.API
@@ -50,12 +49,11 @@ namespace Identity.API
             services.AddTransient<IRoleStore<Role>, RoleStores>();
 
             services.AddTransient<IUserRepository, UserRespository>();
-            services.AddTransient<IRoleRepository, RoleRepository>();
-
-            services.AddTransient<ISignUpService, SignUpService>();
 
             services.ConfigureEventBus(Configuration);
             services.ConfigureRabbitMQEventBus(Configuration);
+
+            services.AddTransient<AccountInvalidatedIntegrationEventHandler>();
 
             var container = new ContainerBuilder();
             container.Populate(services);
@@ -72,7 +70,7 @@ namespace Identity.API
                 ExceptionHandler = new ExceptionHandler().Invoke
             });
 
-            app.ConfigureEventBusFromApp();
+            app.ConfigureEventBusSubscribers();
 
             app.UseSwagger();
 

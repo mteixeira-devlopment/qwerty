@@ -13,8 +13,19 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
 
     <PackageReference Include="FluentValidation" Version="8.2.0" />
+
+    <PackageReference Include="MediatR" Version="5.1.0" />
     
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\EventBus\EventBus.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\SharedKernel\SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Commands\" />
   </ItemGroup>
 
 </Project>

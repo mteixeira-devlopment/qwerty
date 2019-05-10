@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Account.API.Application.Commands.Handlers;
 using Autofac;
 using MediatR;
 
@@ -11,7 +12,11 @@ namespace Account.API.Infrastructure.AutofacModules
             builder
                 .RegisterAssemblyTypes(typeof(IMediator).GetTypeInfo().Assembly)
                 .AsImplementedInterfaces();
-          
+
+            builder
+                .RegisterAssemblyTypes(typeof(CreateAccountCommandHandler).GetTypeInfo().Assembly)
+                .AsClosedTypesOf(typeof(IRequestHandler<,>));
+
             builder.Register<ServiceFactory>(context =>
             {
                 var componentContext = context.Resolve<IComponentContext>();

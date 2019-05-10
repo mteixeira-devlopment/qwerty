@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
+
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
+
+    <PackageReference Include="FluentValidation" Version="8.2.0" />
+
+    <PackageReference Include="MediatR" Version="5.1.0" />
+
+    <PackageReference Include="Gerencianet.SDK" Version="1.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\EventBus\EventBus.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\SharedKernel\SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\IntegrationEvents\EventHandlers\" />
+    <Folder Include="Application\IntegrationEvents\Events\" />
+  </ItemGroup>
+</Project>

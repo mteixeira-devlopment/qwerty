@@ -1,71 +1,90 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using EventBus.Abstractions;
 using Identity.API.Application.Commands.Models;
+using Identity.API.Application.Commands.Validations;
 using Identity.API.Application.IntegrationEvents.Events;
 using Identity.API.Domain;
-using Identity.API.Domain.Handlers;
-using MediatR;
 using Microsoft.AspNetCore.Identity;
+using SharedKernel.Commands;
+using SharedKernel.Handlers;
+using SharedKernel.Responses;
+using SharedKernel.Validations;
 
 namespace Identity.API.Application.Commands.Handlers
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommandModel, bool>
+    public class CreateUserCommandHandler : CommandHandler<CreateUserCommandModel>
     {
         private readonly IEventBus _eventBus;
-        private readonly IMediator _metiator;
-
-        private readonly INotificationHandler _domainNotificationHandler;
+        
         private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
 
         public CreateUserCommandHandler(
             IEventBus eventBus, 
-            IMediator metiator, 
-            INotificationHandler domainNotificationHandler, 
+            INotificationHandler notificationHandler, 
             UserManager<User> userManager, 
-            IUserRepository userRepository)
+            IUserRepository userRepository) : base(notificationHandler)
         {
             _eventBus = eventBus;
-            _metiator = metiator;
-
-            _domainNotificationHandler = domainNotificationHandler;
+            
             _userManager = userManager;
             _userRepository = userRepository;
         }
 
-        public async Task<bool> Handle(CreateUserCommandModel request, CancellationToken cancellationToken)
+        public override async Task<CommandResponse> HandleCommand(CreateUserCommandModel request, CancellationToken cancellationToken)
         {
+            var validModel = await CheckIfModelIsValid<CreateUserCommandValidator>(request);
+            if (!validModel) return ReplyFailure();
+
             var user = new User(request.Username);
 
+            var doesNotExistUser = await CheckIfUserDoesNotExists(user);
+            if (!doesNotExistUser) return ReplyFailure();
+
+            var userCreatedSuccesfully = await TryCreateUser(user, request);
+            if (!userCreatedSuccesfully) return ReplyFailure();
+
+            await _userRepository
+                .Commit()
+                .ConfigureAwait(true);
+
+            await PublishUserValidatedIntegrationEvent(user, request);
+
+            return ReplySuccessful($"Obrigado por se cadastrar! Aguarde enquanto analisamos sua documentação.");
+        }
+
+        private async Task<bool> CheckIfUserDoesNotExists(User user)
+        {
             var existingUser = await _userManager.FindByNameAsync(user.Username).ConfigureAwait(false);
-            if (existingUser != null)
-            {
-                _domainNotificationHandler.Notify("Este email já está em uso");
+            if (existingUser == null)
+                return await Task.FromResult(true);
 
-                return false;
-            }
+            NotificationHandler.Notify("Este email já está em uso");
 
+            return await Task.FromResult(false);
+        }
+
+        private async Task<bool> TryCreateUser(User user, CreateUserCommandModel requestModel)
+        {
             var createResult = await _userManager
-                .CreateAsync(user, request.Password).ConfigureAwait(false);
+                .CreateAsync(user, requestModel.Password)
+                .ConfigureAwait(false);
 
-            if (!createResult.Succeeded)
-            {
-                foreach (var createError in createResult.Errors)
-                    _domainNotificationHandler.Notify(createError.Description);
+            if (createResult.Succeeded) return await Task.FromResult(true);
 
-                return false;
-            }
+            foreach (var createError in createResult.Errors)
+                NotificationHandler.Notify(createError.Description);
 
-            await _userRepository.Commit().ConfigureAwait(false);
+            return await Task.FromResult(false);
+        }
 
+        private async Task PublishUserValidatedIntegrationEvent(User user, CreateUserCommandModel requestModel)
+        {
             var userValidated = new UserValidatedIntegrationEvent(
-                user.Id, request.FullName, request.BirthDate, request.Document);
+                user.Id, requestModel.FullName, requestModel.BirthDate, requestModel.Document);
 
-            _eventBus.Publish(userValidated);
-
-            return true;
+            await Task.Run(() => _eventBus.Publish(userValidated));
         }
     }
 }

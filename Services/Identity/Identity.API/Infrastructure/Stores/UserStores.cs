@@ -31,9 +31,9 @@ namespace Identity.API.Infrastructure.Stores
             return await Task.FromResult(user.Username);
         }
 
-        public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
+        public async Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await Task.FromResult(user.Id.ToString());
         }
 
         public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
@@ -41,9 +41,9 @@ namespace Identity.API.Infrastructure.Stores
             throw new NotImplementedException();
         }
 
-        public Task<string> GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
+        public async Task<string> GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await Task.FromResult(user.Username.ToUpperInvariant());
         }
 
         public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)

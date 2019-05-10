@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using EventBus.Abstractions;
-using Identity.API.Application.Commands;
 using Identity.API.Application.Commands.Models;
 using Identity.API.Application.IntegrationEvents.Events;
 using MediatR;

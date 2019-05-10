@@ -13,7 +13,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     },
     {
-      "DownstreamPathTemplate": "/identity/signup",
+      "DownstreamPathTemplate": "/signup",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -24,7 +24,7 @@
       "UpstreamPathTemplate": "/identity-api/signup"
     },
     {
-      "DownstreamPathTemplate": "/identity/signin",
+      "DownstreamPathTemplate": "/signin/{catchAll}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -32,7 +32,7 @@
           "Port": 7001
         }
       ],
-      "UpstreamPathTemplate": "/identity-api/signin"
+      "UpstreamPathTemplate": "/identity-api/signin/{catchAll}"
     },
     {
       "DownstreamPathTemplate": "/api/values",
@@ -62,6 +62,17 @@
         "UserType": "fgdg"
       }
 
+    },
+    {
+      "DownstreamPathTemplate": "/deposit/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "UpstreamPathTemplate": "/deposit-api/deposit/{catchAll}"
     }
   ],
   "GlobalConfiguration": {

@@ -1,22 +1,26 @@
 ﻿using System.Threading.Tasks;
+using Account.API.Application.Commands.Models;
 using Account.API.Application.IntegrationEvents.Events;
 using EventBus.Abstractions;
+using MediatR;
 
 namespace Account.API.Application.IntegrationEvents.EventHandlers
 {
     public class UserValidatedIntegrationEventHandler : IIntegrationEventHandler<UserValidatedIntegrationEvent>
     {
-        private readonly IEventBus _eventBus;
+        private readonly IMediator _mediator;
 
-        public UserValidatedIntegrationEventHandler(IEventBus eventBus)
+        public UserValidatedIntegrationEventHandler(IMediator mediator)
         {
-            _eventBus = eventBus;
+            _mediator = mediator;
         }
 
         public async Task Handle(UserValidatedIntegrationEvent @event)
         {
-            var accountInvalidated = new AccountInvalidatedIntegrationEvent(@event.UserId, new [] { $"Este documento {@event.Document} já existe vinculado a outra conta." });
-            Task.Run(() => _eventBus.Publish(accountInvalidated));
+            var createAccountCommandModel = new CreateAccountCommandModel(
+                @event.UserId, @event.FullName, @event.BirthDate, @event.Document);
+
+            await _mediator.Send(createAccountCommandModel);
         }
     }
 }

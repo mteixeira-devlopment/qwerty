@@ -1,6 +1,6 @@
-﻿using Account.API.Domain.Seed;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Seed;
 
 namespace Account.API.Infrastructure.Data.EFConfiguration
 {

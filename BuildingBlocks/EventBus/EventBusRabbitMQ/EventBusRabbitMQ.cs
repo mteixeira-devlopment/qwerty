@@ -75,7 +75,7 @@ namespace EventBusRabbitMQ
 
             var channel = _persister.CreateModel();
 
-            channel.ExchangeDeclare(BROKER_NAME, "direct");
+            channel.ExchangeDeclare(BROKER_NAME, "fanout");
             channel.QueueDeclare(_queueName, true, false, false, null);
             channel.CallbackException += (sender, ea) =>
             {
@@ -107,7 +107,7 @@ namespace EventBusRabbitMQ
             {
                 var eventName = @event.GetType().Name;
 
-                channel.ExchangeDeclare(BROKER_NAME, "direct");
+                channel.ExchangeDeclare(BROKER_NAME, "fanout");
 
                 var message = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(message);
@@ -195,12 +195,13 @@ namespace EventBusRabbitMQ
                     throw new InvalidOperationException($"Fake exception requested: '{message}'");
 
                 await ProcessEvent(eventName, message);
+
+                _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
+
             } catch (Exception exception)
             {
                 _logger.LogWarning(exception, $"***** ERROR Processing message {message}");
             }
-
-            _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
         }
 
         private async Task ProcessEvent(string eventName, string message)

@@ -1,9 +1,10 @@
 ﻿using System;
 using MediatR;
+using SharedKernel.Responses;
 
 namespace Identity.API.Application.Commands.Models
 {
-    public sealed class CreateUserCommandModel : IRequest<bool>
+    public sealed class CreateUserCommandModel : IRequest<CommandResponse>
     {
         public string Username { get; private set; }
         public string Password { get; private set; }

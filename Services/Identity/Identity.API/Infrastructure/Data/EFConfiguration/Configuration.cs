@@ -1,6 +1,6 @@
-﻿using Identity.API.Domain.Seed;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Seed;
 
 namespace Identity.API.Infrastructure.Data.EFConfiguration
 {

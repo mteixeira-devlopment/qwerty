@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Notification.API.Domain.Seed;
+using SharedKernel.Seed;
 
 namespace Notification.API.Infrastructure.Data.EFConfiguration
 {

@@ -2,13 +2,12 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 
 namespace Gateway.API.Handlers
 {
     internal sealed class ExceptionHandler
     {
-        public async Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context)
         {
             var httpStatus = HttpStatusCode.InternalServerError;
 
@@ -20,6 +19,8 @@ namespace Gateway.API.Handlers
                 
                 // Gerar Log
             }
+
+            return Task.CompletedTask;
         }
     }
 }

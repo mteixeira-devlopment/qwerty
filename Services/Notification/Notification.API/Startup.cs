@@ -1,13 +1,20 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Notification.API.Application.IntegrationEvents.EventHandlers;
+using Notification.API.Configurations;
 using Notification.API.Domain;
-using Notification.API.Hubs;
+using Notification.API.Infrastructure.AutofacModules;
 using Notification.API.Infrastructure.Data;
 using Notification.API.Infrastructure.Data.Repositories;
-using Notification.API.SharedKernel.Handlers;
+using SharedKernel.Configurations;
+using SharedKernel.Handlers;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Notification.API
@@ -20,10 +27,12 @@ namespace Notification.API
         }
 
         public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+       
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             services.AddSwaggerGen(c => c.SwaggerDoc(
                 "v1", new Info { Title = "Notification Api", Version = "v1" }));
 
@@ -42,7 +51,18 @@ namespace Notification.API
 
             services.AddSignalR();
 
-            services.AddMvc();
+            services.ConfigureRabbitMQEventBus(Configuration);
+            services.ConfigureEventBus(Configuration);
+
+            services.AddTransient<AccountInvalidatedIntegrationEventHandler>();
+            services.AddTransient<AccountCreatedIntegrationEventHandler>();
+
+            var container = new ContainerBuilder();
+            container.Populate(services);
+
+            container.RegisterModule(new MediatorModule());
+
+            return new AutofacServiceProvider(container.Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,13 +73,14 @@ namespace Notification.API
                 ExceptionHandler = new ExceptionHandler().Invoke
             });
 
+            app.ConfigureEventBusSubscribers();
+
             app.UseCors("*");
 
-            app.UseSignalR(routes => { routes.MapHub<SignUpHub>("/jesus"); });
-
             app.UseSwagger();
-
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Notification Api"));
+
+            app.UseSignalR();
 
             app.UseMvc();
         }

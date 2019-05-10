@@ -1,9 +1,10 @@
 ﻿using System;
 using MediatR;
+using SharedKernel.Responses;
 
 namespace Identity.API.Application.Commands.Models
 {
-    public sealed class CancelUserCommandModel : IRequest<bool>
+    public sealed class CancelUserCommandModel : IRequest<CommandResponse>
     {
         public Guid UserId { get; private set; }
 

@@ -7,7 +7,7 @@ namespace Notification.API.Configurations
     {
         public static void UseSignalR(this IApplicationBuilder app)
         {
-            app.UseSignalR(routes => { routes.MapHub<SignUpHub>("/jesus"); });
+            app.UseSignalR(routes => { routes.MapHub<RequestResponseMessageHub>("/jesus"); });
         }
     }
 }
