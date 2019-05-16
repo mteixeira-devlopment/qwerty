@@ -27,5 +27,6 @@
   <ItemGroup>
     <Folder Include="Application\IntegrationEvents\EventHandlers\" />
     <Folder Include="Application\IntegrationEvents\Events\" />
+    <Folder Include="Infrastructure\DTOs\" />
   </ItemGroup>
 </Project>

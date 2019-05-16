@@ -37,23 +37,17 @@ export class AppComponent implements OnInit {
     console.log('b => ', paymentProvider.paymentProvider);
 
     const paymentInformations = {
-      brand: 'visa',
-      number: '4012001038443335',
-      cvv: '123',
-      expiration_month: '05',
-      expiration_year: '2018'
+      brand: 'mastercard',
+      number: '5502095146333358',
+      cvv: '687',
+      expiration_month: '04',
+      expiration_year: '2027'
     };
 
     paymentProvider.paymentProvider.pay(paymentInformations, (response) => {
-      let paymentInfo = {
-        value: 500,
+      const paymentInfo = {
         accountId: '4afa6d0c-9459-4acf-8e0a-4c6df7e47037',
-        creditCardName: 'Maria',
-        creditCardNumber: paymentInformations.number,
-        creditCardExpirationYear: paymentInformations.expiration_year,
-        creditCardExpirationMonth: paymentInformations.expiration_month,
-        creditCardSecurityNumber: paymentInformations.cvv,
-        creditCardMask: response.data.card_mask,
+        value: 500,
         paymentToken: response.data.payment_token
       };
 

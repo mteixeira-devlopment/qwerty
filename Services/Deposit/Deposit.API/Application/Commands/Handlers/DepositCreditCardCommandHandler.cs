@@ -28,17 +28,10 @@ namespace Deposit.API.Application.Commands.Handlers
             var validModel = await CheckIfModelIsValid<DepositCreditCardCommandValidator>(request);
             if (!validModel) return ReplyFailure();
 
-            var paymentMethod = new CreditCard(
-                request.AccountId, 
-                request.CreditCardName, 
-                request.CreditCardNumber, 
-                request.CreditCardExpirationYear, 
-                request.CreditCardExpirationMonth, 
-                request.CreditCardSecurityNumber);
+            var providerCharge = await _payRepository.CreateCharge(request.Value);
+            var charge = new Charge(providerCharge.ChargeId, providerCharge.Total, providerCharge.CreatedAt);
 
-            var deposit = new Depos(request.Value, paymentMethod);
-
-            await _payRepository.PayCreditCard(deposit, request.PaymentToken, request.CreditCardMask);
+            await _payRepository.PayCreditCard(charge.ChargeId, request.PaymentToken);
 
             return ReplySuccessful();
         }
