@@ -5,6 +5,7 @@ using Deposit.API.Domain;
 using Deposit.API.Infrastructure.AutofacModules;
 using Deposit.API.Infrastructure.Data;
 using Deposit.API.Infrastructure.Data.ExternalRepositories;
+using Deposit.API.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,7 @@ namespace Deposit.API
             services.AddScoped<INotificationHandler, NotificationHandler>();
 
             services.AddScoped<IPayRepository, PayRepository>();
+            services.AddScoped<IDepositRepository, DepositRepository>();
 
             services.ConfigureRabbitMQEventBus(Configuration);
             services.ConfigureEventBus(Configuration);

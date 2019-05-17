@@ -76,6 +76,6 @@ export class AppComponent implements OnInit {
 
     this.appService
       .signUpUser(user)
-      .subscribe(res => console.log('FOI'), err => console.log('ERR => ', err, err.error.errors[0]));
+      .subscribe(res => console.log(res), err => console.log('ERR => ', err.error.errors[0]));
   }
 }

@@ -4,7 +4,7 @@ script.type = 'text/javascript';
 var random = Math.random() * 1000000;
 var randomToken = parseInt(random);
 
-script.src = `https://api.gerencianet.com.br/v1/cdn/a9a414ab43db61b628dc4a91e8bf5a58/${randomToken}`;
+script.src = `https://sandbox.gerencianet.com.br/v1/cdn/a9a414ab43db61b628dc4a91e8bf5a58/${randomToken}`;
 script.async = false;
 
 script.id = 'a9a414ab43db61b628dc4a91e8bf5a58';

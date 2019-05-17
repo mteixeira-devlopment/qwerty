@@ -21,8 +21,10 @@ namespace SharedKernel.Commands
 
         public CommandResponse ReplyFailure() => new CommandResponse(false);
 
-        public async Task<CommandResponse> Handle(TModel request, CancellationToken cancellationToken = default(CancellationToken)) 
-            => await HandleCommand(request, cancellationToken);
+        public async Task<CommandResponse> Handle(TModel request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await HandleCommand(request, cancellationToken);
+        }
 
         public abstract Task<CommandResponse> HandleCommand(TModel request, CancellationToken cancellationToken);
 

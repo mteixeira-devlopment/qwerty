@@ -5,6 +5,7 @@ namespace Deposit.API.Domain.DataTransferObjects
 {
     public class ChargeTransferObject
     {
+        [JsonProperty("code")]
         public int Code { get; set; }
 
         [JsonProperty("data")]

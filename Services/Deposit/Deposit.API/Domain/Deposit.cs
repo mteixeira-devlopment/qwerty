@@ -8,12 +8,12 @@ namespace Deposit.API.Domain
     public class Charge : Entity
     {
         public int ChargeId { get; private set; }
-        public decimal Value { get; private set; }
+        public int Value { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
         public int Status { get; private set; }
 
-        public Charge(int chargeId, decimal value, DateTime createdAt)
+        public Charge(int chargeId, int value, DateTime createdAt)
         {
             ChargeId = chargeId;
             Value = value;
@@ -71,7 +71,12 @@ namespace Deposit.API.Domain
     public interface IPayRepository
     {
         Task<ChargeTransferObject.Data> CreateCharge(decimal value);
-        Task PayCreditCard(int chargeId, string paymentToken);
+        Task<PaymentTransferObject.Data> PayCreditCard(int chargeId, string paymentToken);
+    }
+
+    public interface IDepositRepository
+    {
+        Task<Charge> CreateCharge(Charge charge);
     }
 
     public class ChargeStatus : Enumeration<ChargeStatus>
