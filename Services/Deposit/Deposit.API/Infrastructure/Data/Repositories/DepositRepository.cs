@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Deposit.API.Domain;
 
+using Depos = Deposit.API.Domain.Deposit;
+
 namespace Deposit.API.Infrastructure.Data.Repositories
 {
     public class DepositRepository : IDepositRepository
@@ -12,10 +14,15 @@ namespace Deposit.API.Infrastructure.Data.Repositories
             _depositContext = depositContext;
         }
 
-        public async Task<Charge> CreateCharge(Charge charge)
+        public async Task<Depos> CreateAsync(Depos deposit)
         {
-            await _depositContext.Set<Charge>().AddAsync(charge);
-            return charge;
+            await _depositContext.AddAsync(deposit);
+            return deposit;
+        }
+
+        public async Task Commit()
+        {
+            await _depositContext.SaveChangesAsync();
         }
     }
 }

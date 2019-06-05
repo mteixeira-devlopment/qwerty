@@ -41,7 +41,7 @@ namespace Deposit.API
 
             services.AddScoped<INotificationHandler, NotificationHandler>();
 
-            services.AddScoped<IPayRepository, PayRepository>();
+            services.AddScoped<IPayExternalRepository, PayExternalRepository>();
             services.AddScoped<IDepositRepository, DepositRepository>();
 
             services.ConfigureRabbitMQEventBus(Configuration);

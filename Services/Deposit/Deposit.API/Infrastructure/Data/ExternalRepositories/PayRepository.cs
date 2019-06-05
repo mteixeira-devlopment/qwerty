@@ -5,40 +5,79 @@ using Deposit.API.Domain.DataTransferObjects;
 using Gerencianet.SDK;
 using Newtonsoft.Json;
 
-using Depos = Deposit.API.Domain.Deposit;
-
 namespace Deposit.API.Infrastructure.Data.ExternalRepositories
 {
-    public class PayRepository : IPayRepository
+    public class ExternalResponseContentNullException : Exception
     {
-        public async Task<ChargeTransferObject.Data> CreateCharge(decimal value)
+
+    }
+
+    public class ExternalResponse<TResponseModel>
+    {
+        public bool Success { get; }
+
+        public TResponseModel Content { get; private set; }
+        public string Error { get; private set; }
+
+        public ExternalResponse(bool success) => Success = success;
+
+        public ExternalResponse<TResponseModel> ReplySuccessful(TResponseModel content)
+        {
+            Content = content;
+            return this;
+        }
+
+        public ExternalResponse<TResponseModel> ReplyFail(string error)
+        {
+            Error = error;
+            return this;
+        }
+    }
+
+    public class ExternalRepository
+    {
+        public async Task<ExternalResponse<TResponseModel>> Call<TResponseModel>(Func<object> caller)
+        {
+            try
+            {
+                var response = caller.Invoke();
+                var castedResponse = await CastExternalResponse<TResponseModel>(response);
+
+                return new ExternalResponse<TResponseModel>(true).ReplySuccessful(castedResponse);
+            }
+            catch (Exception exception)
+            {
+                return new ExternalResponse<TResponseModel>(false).ReplyFail(exception.Message);
+            }
+        }
+
+        private async Task<TResponseModel> CastExternalResponse<TResponseModel>(object callResponse)
+        {
+            var serializedResponse = JsonConvert.SerializeObject(callResponse);
+            var deserializedResponse = JsonConvert.DeserializeObject<TResponseModel>(serializedResponse);
+
+            return await Task.FromResult(deserializedResponse);
+        }
+    }
+
+    public class PayExternalRepository : ExternalRepository, IPayExternalRepository
+    {
+        public async Task<ExternalResponse<ChargeTransferObject>> CreateCharge(ChargeBodyTransferObject chargeBody)
         {
             dynamic endpoint = new Endpoints(
                 "Client_Id_74b485376ceef56724b1c454b1a17379dc786fb5", "Client_Secret_b9366d778d887f5cfade0c1fda64de2b8fdda2b4", true);
 
-            var chargeBody = new ChargeBodyTransferObject(value);
-
-            var response = JsonConvert.SerializeObject(endpoint.CreateCharge(null, chargeBody)) as string;
-            var charge = JsonConvert.DeserializeObject<ChargeTransferObject>(response);
-
-            return await Task.FromResult(charge.DataObject);
+            var createChargeResponse = await Call<ChargeTransferObject>(() => endpoint.CreateCharge(null, chargeBody));
+            return createChargeResponse;
         }
 
-        public async Task<PaymentTransferObject.Data> PayCreditCard(int chargeId, string paymentToken)
+        public async Task<ExternalResponse<PaymentTransferObject>> PayCreditCard(int chargeId, PaymentCreditCardBodyTransferObject paymentBody)
         {
             dynamic endpoints = new Endpoints(
                 "Client_Id_74b485376ceef56724b1c454b1a17379dc786fb5", "Client_Secret_b9366d778d887f5cfade0c1fda64de2b8fdda2b4", true);
 
-            var paymentBody = new PaymentCreditCardBodyTransferObject(paymentToken);
-            var paymentObject = paymentBody.PaymentObject;
-
-            paymentObject.Card.AddBillingAddress("Av Darcy Vargas", 713, "Ipiranga", "36031100", "Juiz de Fora", "MG");
-            paymentObject.Card.AddCustomer("Maycon Teixeira", "mteixeira.dev@outlook.com", "11709501677", DateTime.Now, "32991179841");
-
-            var response = JsonConvert.SerializeObject(endpoints.PayCharge(new { id = chargeId }, paymentBody)) as string;
-            var payment = JsonConvert.DeserializeObject<PaymentTransferObject>(response);
-
-            return await Task.FromResult(payment.DataObject);
+            var payChargeResponse = await Call<PaymentTransferObject>(() => endpoints.PayCharge(new {id = chargeId}, paymentBody));
+            return payChargeResponse;
         }
     }
 }

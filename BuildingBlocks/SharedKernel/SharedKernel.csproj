@@ -12,10 +12,13 @@
     <PackageReference Include="FluentValidation" Version="8.2.0" />
 
     <PackageReference Include="MediatR" Version="5.1.0" />
+    
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EventBus\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
     <ProjectReference Include="..\EventBus\EventBus\EventBus.csproj" />
   </ItemGroup>
+ 
 </Project>

@@ -62,7 +62,7 @@ namespace Identity.API.Application.Commands.Handlers
 
             NotificationHandler.Notify("Este email já está em uso");
 
-            return await Task.FromResult(false);
+            return false;
         }
 
         private async Task<bool> TryCreateUser(User user, CreateUserCommandModel requestModel)
@@ -76,7 +76,7 @@ namespace Identity.API.Application.Commands.Handlers
             foreach (var createError in createResult.Errors)
                 NotificationHandler.Notify(createError.Description);
 
-            return await Task.FromResult(false);
+            return false;
         }
 
         private async Task PublishUserValidatedIntegrationEvent(User user, CreateUserCommandModel requestModel)

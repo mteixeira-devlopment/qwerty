@@ -16,7 +16,7 @@ namespace Account.API.Infrastructure.Data.Repositories
 
         public async Task<Acc> CreateAsync(Acc account)
         {
-            await _accountContext.Set<Acc>().AddAsync(account);
+            await _accountContext.AddAsync(account);
             return account;
         }
 

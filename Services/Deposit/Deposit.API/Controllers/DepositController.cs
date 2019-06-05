@@ -33,7 +33,11 @@ namespace Deposit.API.Controllers
                 return ReplyBadRequest("É necessário o preenchimento dos dados!");
 
             var result = await _mediator.Send(model);
-            return Reply(result);
+            if (result.Success)
+                return ReplyCreated(result.Content);
+
+            var errors = NotificationHandler.GetNotificationErrors();
+            return ReplyUnprocessableEntity(errors);
         }
     }
 }

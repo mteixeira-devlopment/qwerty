@@ -1,12 +1,15 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Data.EFConfiguration;
+
+using Acc = Account.API.Domain.Account;
 
 namespace Account.API.Infrastructure.Data.EFConfiguration
 {
-    public sealed class AccountConfiguration : Configuration<Domain.Account>
+    public sealed class AccountConfiguration : Configuration<Acc>
     {
-        public override void MapConfigure(EntityTypeBuilder<Domain.Account> accountConfiguration)
+        public override void MapConfigure(EntityTypeBuilder<Acc> accountConfiguration)
         {
             accountConfiguration.Property(acc => acc.UserId)
                 .HasColumnName("id_user")

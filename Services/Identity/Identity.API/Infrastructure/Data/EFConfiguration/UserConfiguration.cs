@@ -1,12 +1,13 @@
 ﻿using Identity.API.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Data.EFConfiguration;
 
 namespace Identity.API.Infrastructure.Data.EFConfiguration
 {
     internal sealed class UserConfiguration : Configuration<User>
     {
-        public override void MapConfiguration(EntityTypeBuilder<User> builder)
+        public override void MapConfigure(EntityTypeBuilder<User> builder)
         {
             builder
                 .Property(p => p.Username)

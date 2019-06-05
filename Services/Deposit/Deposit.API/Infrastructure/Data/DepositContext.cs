@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Deposit.API.Infrastructure.Data.EFConfiguration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Deposit.API.Infrastructure.Data
 {
@@ -12,7 +13,8 @@ namespace Deposit.API.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.ApplyConfiguration(new DepositConfiguration());
+            modelBuilder.ApplyConfiguration(new ChargeConfiguration());
         }
     }
 }

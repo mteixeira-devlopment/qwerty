@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
 
       this.appService
         .PayCreditCard(paymentInfo)
-        .subscribe(res => console.log('FOI'), err => console.log('ERR => ', err));
+        .subscribe(res => console.log(res), err => console.log('ERR => ', err.error.errors[0]));
 
       console.log('fds');
     });

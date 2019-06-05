@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SharedKernel.Seed;
 
-namespace Notification.API.Infrastructure.Data.EFConfiguration
+namespace SharedKernel.Data.EFConfiguration
 {
     public abstract class Configuration<TEntity> : IEntityTypeConfiguration<TEntity>
         where TEntity : Entity

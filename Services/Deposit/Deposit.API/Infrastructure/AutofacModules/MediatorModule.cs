@@ -17,6 +17,10 @@ namespace Deposit.API.Infrastructure.AutofacModules
                 .RegisterAssemblyTypes(typeof(DepositCreditCardCommandHandler).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IRequestHandler<,>));
 
+            builder
+                .RegisterAssemblyTypes(typeof(CreateDepositCommandHandler).GetTypeInfo().Assembly)
+                .AsClosedTypesOf(typeof(IRequestHandler<,>));
+
             builder.Register<ServiceFactory>(context =>
             {
                 var componentContext = context.Resolve<IComponentContext>();

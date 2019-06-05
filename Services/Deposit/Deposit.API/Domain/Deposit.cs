@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Deposit.API.Domain.DataTransferObjects;
+using Deposit.API.Infrastructure.Data.ExternalRepositories;
 using SharedKernel.Seed;
 
 namespace Deposit.API.Domain
 {
     public class Charge : Entity
     {
-        public int ChargeId { get; private set; }
-        public int Value { get; private set; }
+        public int ProviderChargeId { get; private set; }
+        public decimal Value { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
         public int Status { get; private set; }
 
-        public Charge(int chargeId, int value, DateTime createdAt)
+        protected Charge()
         {
-            ChargeId = chargeId;
+
+        }
+
+        public Charge(int chargeId, decimal value, DateTime createdAt)
+        {
+            ProviderChargeId = chargeId;
             Value = value;
             CreatedAt = createdAt;
 
@@ -26,57 +32,33 @@ namespace Deposit.API.Domain
 
     public class Deposit : Entity
     {
+        public Guid AccountId { get; private set; }
+
         public Charge Charge { get; private set; }
         private Guid _chargeId;
 
-        public Payment PaymentMethod { get; private set; }
-        private Guid _paymentMethod;
-
-        public Deposit(Charge charge, Payment paymentMethod)
+        protected Deposit()
         {
-            Charge = charge;
-            PaymentMethod = paymentMethod;
+
         }
-    }
 
-    public class Payment : Entity
-    {
-        public Guid AccountId { get; private set; }
-
-        public Payment(Guid accountId)
+        public Deposit(Guid accountId, Charge charge)
         {
             AccountId = accountId;
+            Charge = charge;
         }
     }
 
-    public class CreditCard : Payment
+    public interface IPayExternalRepository
     {
-        public string Name { get; private set; }
-        public string Number { get; private set; }
-        public int ExpirationYear { get; private set; }
-        public int ExpirationMonth { get; private set; }
-        public string SecurityNumber { get; private set; }
-
-        public CreditCard(Guid accountId, string name, string number, int expirationYear, int expirationMonth, string securityNumber)
-            : base(accountId)
-        {
-            Name = name;
-            Number = number;
-            ExpirationYear = expirationYear;
-            ExpirationMonth = expirationMonth;
-            SecurityNumber = securityNumber;
-        }
-    }
-
-    public interface IPayRepository
-    {
-        Task<ChargeTransferObject.Data> CreateCharge(decimal value);
-        Task<PaymentTransferObject.Data> PayCreditCard(int chargeId, string paymentToken);
+        Task<ExternalResponse<ChargeTransferObject>> CreateCharge(ChargeBodyTransferObject chargeBody);
+        Task<ExternalResponse<PaymentTransferObject>> PayCreditCard(int chargeId, PaymentCreditCardBodyTransferObject paymentBody);
     }
 
     public interface IDepositRepository
     {
-        Task<Charge> CreateCharge(Charge charge);
+        Task<Deposit> CreateAsync(Deposit deposit);
+        Task Commit();
     }
 
     public class ChargeStatus : Enumeration<ChargeStatus>
