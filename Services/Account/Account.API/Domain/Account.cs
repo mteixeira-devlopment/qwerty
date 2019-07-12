@@ -1,5 +1,5 @@
 ﻿using System;
-using SharedKernel.Seed;
+using ServiceSeed.Actors;
 
 namespace Account.API.Domain
 {
@@ -9,6 +9,8 @@ namespace Account.API.Domain
 
         public Customer Customer { get; private set; }
         private Guid _customerId;
+
+        public decimal Balance { get; private set; }
 
         private Account()
         {
@@ -20,6 +22,12 @@ namespace Account.API.Domain
             UserId = userId;
 
             Customer = customer;
+            Balance = 0;
+        }
+
+        public void IncreaseBalance(decimal value)
+        {
+            Balance += value;
         }
     }
 }

@@ -1,16 +1,16 @@
 ﻿using System.Threading.Tasks;
-using Deposit.API.Application.Commands.Models;
+using Deposit.API.Domain.Commands.DepositCreditCard;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel.Controllers;
-using SharedKernel.Handlers;
+using ServiceSeed.Api;
+using ServiceSeed.Handlers;
 
 namespace Deposit.API.Controllers
 {
     [Route("deposit")]
     [ApiController]
-    public class DepositController : ApiController
+    public class DepositController : Api
     {
         private readonly IMediator _mediator;
 

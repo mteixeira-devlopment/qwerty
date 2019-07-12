@@ -27,6 +27,10 @@ namespace Account.API.Migrations
                         .HasColumnName("id")
                         .HasColumnType("VARCHAR(38)");
 
+                    b.Property<decimal>("Balance")
+                        .HasColumnName("balance")
+                        .HasColumnType("DECIMAL(18,2)");
+
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasConversion(new ValueConverter<string, string>(v => default(string), v => default(string), new ConverterMappingHints(size: 36)))

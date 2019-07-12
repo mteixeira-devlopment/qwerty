@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Deposit.API.Domain;
-using Deposit.API.Domain.DataTransferObjects;
+using Deposit.API.Domain.DTOs;
 using Gerencianet.SDK;
 using Newtonsoft.Json;
 

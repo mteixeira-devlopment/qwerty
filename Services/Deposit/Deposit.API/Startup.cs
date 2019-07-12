@@ -1,6 +1,8 @@
 ﻿using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Deposit.API.Application.IntegrationEvents.EventHandlers;
+using Deposit.API.Configurations;
 using Deposit.API.Domain;
 using Deposit.API.Infrastructure.AutofacModules;
 using Deposit.API.Infrastructure.Data;
@@ -13,8 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
-using SharedKernel.Configurations;
-using SharedKernel.Handlers;
+using ServiceSeed.Configurations;
+using ServiceSeed.Handlers;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Deposit.API
@@ -47,6 +49,8 @@ namespace Deposit.API
             services.ConfigureRabbitMQEventBus(Configuration);
             services.ConfigureEventBus(Configuration);
 
+            services.AddTransient<IncreaseBalanceInvalidatedIntegrationEventHandler>();
+
             var container = new ContainerBuilder();
             container.Populate(services);
 
@@ -61,6 +65,8 @@ namespace Deposit.API
             {
                 ExceptionHandler = new ExceptionHandler().Invoke
             });
+
+            app.ConfigureEventBusSubscribers();
 
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Deposit Api"));

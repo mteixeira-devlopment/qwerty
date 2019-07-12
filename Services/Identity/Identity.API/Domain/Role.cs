@@ -1,4 +1,4 @@
-﻿using SharedKernel.Seed;
+﻿using ServiceSeed.Actors;
 
 namespace Identity.API.Domain
 {

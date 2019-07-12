@@ -10,6 +10,6 @@ namespace Notification.API.Hubs
 
     public class RequestResponseMessageHub : Hub<IRequestResponseMessageHub>
     {
-       
+        
     }
 }

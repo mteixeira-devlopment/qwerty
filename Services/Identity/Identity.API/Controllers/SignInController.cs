@@ -1,16 +1,16 @@
 ﻿using System.Threading.Tasks;
-using Identity.API.Application.Commands.Models;
+using Identity.API.Domain.Commands.SignInUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel.Controllers;
-using SharedKernel.Handlers;
+using ServiceSeed.Api;
+using ServiceSeed.Handlers;
 
 namespace Identity.API.Controllers
 {
     [Route("signin")]
     [ApiController]
-    public class SignInController : ApiController
+    public class SignInController : Api
     {
         private readonly IMediator _mediator;
 

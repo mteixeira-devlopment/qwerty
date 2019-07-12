@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using Autofac;
-using Deposit.API.Application.Commands.Handlers;
+using Deposit.API.Domain.Commands.CancelDepositCharge;
+using Deposit.API.Domain.Commands.CreateDeposit;
+using Deposit.API.Domain.Commands.DepositCreditCard;
 using MediatR;
 
 namespace Deposit.API.Infrastructure.AutofacModules
@@ -21,10 +23,14 @@ namespace Deposit.API.Infrastructure.AutofacModules
                 .RegisterAssemblyTypes(typeof(CreateDepositCommandHandler).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IRequestHandler<,>));
 
+            builder
+                .RegisterAssemblyTypes(typeof(CancelDepositChargeCommandHandler).GetTypeInfo().Assembly)
+                .AsClosedTypesOf(typeof(IRequestHandler<,>));
+
             builder.Register<ServiceFactory>(context =>
             {
                 var componentContext = context.Resolve<IComponentContext>();
-                return t => { object o; return componentContext.TryResolve(t, out o) ? o : null; };
+                return t => componentContext.TryResolve(t, out var o) ? o : null;
             });
         }
     }

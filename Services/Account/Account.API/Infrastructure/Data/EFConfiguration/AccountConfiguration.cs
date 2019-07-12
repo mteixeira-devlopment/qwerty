@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SharedKernel.Data.EFConfiguration;
-
+using ServiceSeed.Data.EFConfiguration;
 using Acc = Account.API.Domain.Account;
 
 namespace Account.API.Infrastructure.Data.EFConfiguration
@@ -25,6 +24,12 @@ namespace Account.API.Infrastructure.Data.EFConfiguration
             accountConfiguration.HasOne(acc => acc.Customer)
                 .WithMany()
                 .HasForeignKey("CustomerId");
+
+            accountConfiguration.Property(acc => acc.Balance)
+                .HasColumnName("balance")
+                .HasColumnType("DECIMAL(18,2)")
+                .IsRequired();
+
         }
     }
 }

@@ -2,13 +2,12 @@
 using System.Threading.Tasks;
 using EventBus.Abstractions;
 using EventBus.Events;
-using Identity.API.Application.Commands.Handlers;
-using Identity.API.Application.Commands.Models;
 using Identity.API.Domain;
+using Identity.API.Domain.Commands.CreateUser;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using SharedKernel.Handlers;
+using ServiceSeed.Handlers;
 
 namespace Identity.Test.Commands
 {

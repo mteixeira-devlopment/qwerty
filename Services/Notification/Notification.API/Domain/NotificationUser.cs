@@ -1,5 +1,5 @@
 ﻿using System;
-using SharedKernel.Seed;
+using ServiceSeed.Actors;
 
 namespace Notification.API.Domain
 {

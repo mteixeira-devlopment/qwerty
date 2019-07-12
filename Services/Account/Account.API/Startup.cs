@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SharedKernel.Configurations;
-using SharedKernel.Handlers;
+using ServiceSeed.Configurations;
+using ServiceSeed.Handlers;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Account.API
@@ -45,6 +45,7 @@ namespace Account.API
             services.ConfigureEventBus(Configuration);
 
             services.AddTransient<UserValidatedIntegrationEventHandler>();
+            services.AddTransient<DepositCreatedIntegrationEventHandler>();
 
             var container = new ContainerBuilder();
             container.Populate(services);

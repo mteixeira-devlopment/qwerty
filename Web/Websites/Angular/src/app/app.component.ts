@@ -46,7 +46,7 @@ export class AppComponent implements OnInit {
 
     paymentProvider.paymentProvider.pay(paymentInformations, (response) => {
       const paymentInfo = {
-        accountId: '4afa6d0c-9459-4acf-8e0a-4c6df7e47037',
+        accountId: '0fbf34a6-3572-425c-9c79-55c6f599b59c',
         value: 500,
         paymentToken: response.data.payment_token
       };

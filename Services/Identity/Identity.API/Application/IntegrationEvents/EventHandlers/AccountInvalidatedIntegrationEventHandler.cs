@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using EventBus.Abstractions;
-using Identity.API.Application.Commands.Models;
 using Identity.API.Application.IntegrationEvents.Events;
+using Identity.API.Domain.Commands.CancelUser;
 using MediatR;
 
 namespace Identity.API.Application.IntegrationEvents.EventHandlers
@@ -23,6 +23,11 @@ namespace Identity.API.Application.IntegrationEvents.EventHandlers
         {
             var cancelUser = new CancelUserCommandModel(@event.UserId);
             await _mediator.Send(cancelUser);
+        }
+
+        public void Handle2()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

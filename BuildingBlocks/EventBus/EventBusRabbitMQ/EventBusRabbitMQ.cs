@@ -7,10 +7,12 @@ using EventBus;
 using EventBus.Abstractions;
 using EventBus.Events;
 using EventBus.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
+using Polly.Retry;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
@@ -19,31 +21,51 @@ namespace EventBusRabbitMQ
 {
     public class EventBusRabbitMQ : IEventBus, IDisposable
     {
+        /// <summary>
+        /// Nome dado a exchange.
+        /// Uma única exchange será utilizada com esta abordagem.
+        /// </summary>
         const string BROKER_NAME = "qwerty_event_bus";
 
+        /// <summary>
+        /// Owner da conexão com o RabbitMq.
+        /// </summary>
         private readonly IRabbitMQPersisterConnection _persister;
         private readonly ILogger<EventBusRabbitMQ> _logger;
-        private readonly IEventBusSubscriptionManager _subscriptionManager;
-        private readonly ILifetimeScope _autofac;
 
+        /// <summary>
+        /// Gerenciador de eventos e manipuladores em memória.
+        /// </summary>
+        private readonly IEventBusSubscriptionManager _subscriptionManager;
+
+        /// <summary>
+        /// Injetor em tempo de execução para os manipuladores processados.
+        /// </summary>
+        private readonly ILifetimeScope _autofac;
         private readonly string AUTOFAC_SCOPE_NAME = "qwerty_event_bus";
+
+        private readonly IServiceProvider _serviceProvider;
+
         private readonly int _retryCount;
 
         private IModel _consumerChannel;
         private string _queueName;
 
         public EventBusRabbitMQ(
-            IRabbitMQPersisterConnection persister, 
-            ILogger<EventBusRabbitMQ> logger,
-            IEventBusSubscriptionManager subscriptionManager,
-            ILifetimeScope autofac,             
-            string queueName = null, 
+            IServiceProvider serviceProvider,
+            string queueName,
             int retryCount = 5)
         {
-            _persister = persister ?? throw new ArgumentNullException(nameof(persister));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _subscriptionManager = subscriptionManager ?? new InMemoryEventBusSubscriptionsManager();
-            _autofac = autofac;
+            _persister = serviceProvider.GetRequiredService<IRabbitMQPersisterConnection>() 
+                         ?? throw new ArgumentNullException(nameof(_persister));
+
+            _logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQ>>() 
+                      ?? throw new ArgumentNullException(nameof(_logger));
+
+            _subscriptionManager = serviceProvider.GetRequiredService<IEventBusSubscriptionManager>()
+                                   ?? new InMemoryEventBusSubscriptionsManager();
+           
+            _serviceProvider = serviceProvider;
 
             _queueName = queueName;
             _retryCount = retryCount;
@@ -68,6 +90,10 @@ namespace EventBusRabbitMQ
             }
         }
 
+        /// <summary>
+        /// Cria o canal consumidor e declara a fila.
+        /// </summary>
+        /// <returns></returns>
         private IModel CreateConsumerChannel()
         {
             if (!_persister.IsConnected)
@@ -88,6 +114,10 @@ namespace EventBusRabbitMQ
             return channel;
         }
 
+        /// <summary>
+        /// Publica um evento recebido por parâmetro.
+        /// </summary>
+        /// <param name="event"></param>
         public void Publish(IntegrationEvent @event)
         {
             if (!_persister.IsConnected) _persister.TryConnect();
@@ -96,13 +126,24 @@ namespace EventBusRabbitMQ
                 .Or<SocketException>()
                 .WaitAndRetry(
                     _retryCount,
-                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), 
-                    (ex, time) 
+                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    (ex, time)
                         => _logger.LogWarning(
-                            ex, 
-                            $"Could not publish event: {@event.EventId} after {time.TotalSeconds:N1}s", 
+                            ex,
+                            $"Não foi possível public o evento {@event.EventId} após {time.TotalSeconds:N1}s",
                             ex.Message));
 
+            CreateModel(@event, policy);
+        }
+
+        /// <summary>
+        /// Obtem um canal, sessão e modelo com base em um evento e uma política de re-tentantivas.
+        /// Obtém a exchange do canal e publica a mensagem.
+        /// </summary>
+        /// <param name="event"></param>
+        /// <param name="policy"></param>
+        private void CreateModel(IntegrationEvent @event, RetryPolicy policy)
+        {
             using (var channel = _persister.CreateModel())
             {
                 var eventName = @event.GetType().Name;
@@ -122,9 +163,14 @@ namespace EventBusRabbitMQ
             }
         }
 
+        /// <summary>
+        /// Assina o evento recebido por parâmetro.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="eventName"></param>
         public void SubscribeDynamic<T>(string eventName) where T : IDynamicIntegrationEventHandler
         {
-            _logger.LogInformation($"Subscription to event {eventName} with {typeof(T).GetGenericTypeDefinition()}");
+            _logger.LogInformation($"Assinando o evento {eventName} com {typeof(T).GetGenericTypeDefinition()}");
 
             DoInternalSubscription(eventName);
 
@@ -132,31 +178,40 @@ namespace EventBusRabbitMQ
             StartBasicConsume();
         }
 
-        public void Subscribe<T, TH>()
+       public void Subscribe<T, TH>()
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
             var eventName = _subscriptionManager.GetEventKey<T>();
             DoInternalSubscription(eventName);
 
-            _logger.LogInformation($"Subscribing to event {eventName} with {typeof(TH).GetGenericTypeName()}");
+            _logger.LogInformation($"Assinando o evento {eventName} com {typeof(TH).GetGenericTypeName()}");
 
             _subscriptionManager.AddSubscription<T, TH>();
             StartBasicConsume();
         }
 
+        /// <summary>
+        /// Agrega a assinatura interna para o gerenciador de eventos e manipuladores.
+        /// Binda o evento à fila do serviço e routing key específica daquele evento.
+        /// </summary>
+        /// <param name="eventName"></param>
         private void DoInternalSubscription(string eventName)
         {
             var containsKey = _subscriptionManager.HasSubscriptionsForEvent(eventName);
             if (containsKey) return;
 
-            if (!_persister.IsConnected)
-                _persister.TryConnect();
+            if (!_persister.IsConnected) _persister.TryConnect();
 
             using (var channel = _persister.CreateModel())
                 channel.QueueBind(_queueName, BROKER_NAME, eventName);
         }
 
+        /// <summary>
+        /// Remove a assinatura do evento recebido por parâmetro.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="eventName"></param>
         public void UnsubscribeDynamic<T>(string eventName) where T : IDynamicIntegrationEventHandler
         {
             _subscriptionManager.RemoveDynamicSubscription<T>(eventName);
@@ -168,10 +223,13 @@ namespace EventBusRabbitMQ
         {
             var eventName = _subscriptionManager.GetEventKey<T>();
 
-            _logger.LogInformation($"Unsubscriibing from event {eventName}");
+            _logger.LogInformation($"Removendo assinatura de {eventName}");
             _subscriptionManager.RemoveSubscription<T, TH>();
         }
 
+        /// <summary>
+        /// Inicia um consumidor e atribui o evento de consumo.
+        /// </summary>
         private void StartBasicConsume()
         {
             if (_consumerChannel != null)
@@ -184,6 +242,13 @@ namespace EventBusRabbitMQ
             }
         }
 
+        /// <summary>
+        /// Consome os eventos baseados na chave de rota enviada no eventArgs.
+        /// Tenta processar o evento e confirma com o "aceite".
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
+        /// <returns></returns>
         private async Task ConsumerReceived(object sender, BasicDeliverEventArgs eventArgs)
         {
             var eventName = eventArgs.RoutingKey;
@@ -191,48 +256,57 @@ namespace EventBusRabbitMQ
 
             try
             {
-                if (message.ToLowerInvariant().Contains("throw-fake-exception"))
-                    throw new InvalidOperationException($"Fake exception requested: '{message}'");
-
                 await ProcessEvent(eventName, message);
-
                 _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
 
-            } catch (Exception exception)
+            }
+            catch (Exception exception)
             {
-                _logger.LogWarning(exception, $"***** ERROR Processing message {message}");
+                _logger.LogWarning(exception, $"Não foi possível processar a mensagem: {message}");
             }
         }
 
+        /// <summary>
+        /// Processa o evento com base no nome recebido por parâmetro.
+        /// </summary>
+        /// <param name="eventName"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         private async Task ProcessEvent(string eventName, string message)
         {
+            // Verifica se há assinantes para o evento.
             if (_subscriptionManager.HasSubscriptionsForEvent(eventName))
             {
-                using (var scope = _autofac.BeginLifetimeScope(AUTOFAC_SCOPE_NAME))
+                // Obtem os assinantes.
+                var subscriptions = _subscriptionManager.GetHandlersForEvent(eventName);
+                foreach (var subscription in subscriptions)
                 {
-                    var subscriptions = _subscriptionManager.GetHandlersForEvent(eventName);
-                    foreach (var subscription in subscriptions)
+                    if (subscription.IsDynamic)
                     {
-                        if (subscription.IsDynamic)
-                        {
-                            var handler 
-                                = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
+                        // Para assinantes dinâmicos.
+                        if (!(_serviceProvider.GetRequiredService(subscription.HandlerType) 
+                            is IDynamicIntegrationEventHandler handler))
+                                throw new Exception($"Erro ao obter o handler do evento {eventName}");
 
-                            dynamic eventData = JObject.Parse(message);
-                            await handler.Handle(eventData);
-                        }
-                        else
-                        {
-                            var eventType = _subscriptionManager.GetEventTypeByName(eventName);
+                        dynamic eventData = JObject.Parse(message);
+                        await handler.Handle(eventData);
+                    }
+                    else
+                    {
+                        // Para assinantes tipados.
+                        var eventType = _subscriptionManager.GetEventTypeByName(eventName);
 
-                            var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                        // Obtem o evento a partir da mensagem e do tipo.
+                        var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
 
-                            var handler = scope.ResolveOptional(subscription.HandlerType);
-                            var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                        // Obtem o handler injetado com base no evento.
+                        var handler = _serviceProvider.GetRequiredService(subscription.HandlerType);
 
-                            await (Task) concreteType.GetMethod("Handle")
-                                .Invoke(handler, new object[] {integrationEvent});
-                        }
+                        // Obtem o type genérico do handler do evento.
+                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+
+                        // Invoca o método.
+                        concreteType.GetMethod("Handle").Invoke(handler, new[] { integrationEvent });
                     }
                 }
             }
@@ -241,7 +315,6 @@ namespace EventBusRabbitMQ
         public void Dispose()
         {
             _consumerChannel?.Dispose();
-
             _subscriptionManager.Clear();
         }
     }

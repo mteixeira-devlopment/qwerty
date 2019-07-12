@@ -38,5 +38,10 @@ namespace Notification.API.Application.IntegrationEvents.EventHandlers
 
             await _hubContext.Clients.All.Notify($"Conta {@event.AccountNumber} criada com sucesso!");
         }
+
+        public void Handle2()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

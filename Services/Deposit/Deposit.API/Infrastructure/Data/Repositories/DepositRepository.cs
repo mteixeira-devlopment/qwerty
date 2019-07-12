@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Deposit.API.Domain;
-
+using Microsoft.EntityFrameworkCore;
 using Depos = Deposit.API.Domain.Deposit;
 
 namespace Deposit.API.Infrastructure.Data.Repositories
@@ -20,9 +21,22 @@ namespace Deposit.API.Infrastructure.Data.Repositories
             return deposit;
         }
 
-        public async Task Commit()
+        public async Task<Depos> Get(Guid id)
         {
-            await _depositContext.SaveChangesAsync();
+            return await _depositContext.Set<Depos>()
+                .Include(d => d.Charge)
+                .FirstOrDefaultAsync(dep => dep.Id == id);
         }
+
+        public async Task UpdateChargeStatus(Charge charge)
+        {
+            await Task.FromResult(_depositContext
+                .Entry(charge)
+                .Property(ch => ch.Status)
+                .IsModified = true);
+        }
+
+        public async Task<bool> Commit()
+            => await _depositContext.SaveChangesAsync() > 0;
     }
 }

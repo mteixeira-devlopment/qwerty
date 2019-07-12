@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
-using Account.API.Application.Commands.Handlers;
+using Account.API.Domain.Commands.CreateAccount;
+using Account.API.Domain.Commands.IncreaseBalance;
 using Autofac;
 using MediatR;
 
@@ -17,10 +18,14 @@ namespace Account.API.Infrastructure.AutofacModules
                 .RegisterAssemblyTypes(typeof(CreateAccountCommandHandler).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IRequestHandler<,>));
 
+            builder
+                .RegisterAssemblyTypes(typeof(IncreaseBalanceCommandHandler).GetTypeInfo().Assembly)
+                .AsClosedTypesOf(typeof(IRequestHandler<,>));
+
             builder.Register<ServiceFactory>(context =>
             {
                 var componentContext = context.Resolve<IComponentContext>();
-                return t => { object o; return componentContext.TryResolve(t, out o) ? o : null; };
+                return t => componentContext.TryResolve(t, out var o) ? o : null;
             });
         }
     }

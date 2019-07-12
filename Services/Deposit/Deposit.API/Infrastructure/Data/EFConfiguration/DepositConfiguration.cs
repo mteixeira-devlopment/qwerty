@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SharedKernel.Data.EFConfiguration;
-
+using ServiceSeed.Data.EFConfiguration;
 using Depos = Deposit.API.Domain.Deposit;
 
 namespace Deposit.API.Infrastructure.Data.EFConfiguration

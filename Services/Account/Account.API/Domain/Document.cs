@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SharedKernel.Seed;
+using ServiceSeed.Actors;
 
 namespace Account.API.Domain
 {

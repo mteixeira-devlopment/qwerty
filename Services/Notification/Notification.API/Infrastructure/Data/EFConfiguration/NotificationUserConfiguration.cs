@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.API.Domain;
-using SharedKernel.Data.EFConfiguration;
+using ServiceSeed.Data.EFConfiguration;
 
 namespace Notification.API.Infrastructure.Data.EFConfiguration
 {

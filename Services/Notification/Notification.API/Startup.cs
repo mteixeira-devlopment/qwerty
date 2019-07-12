@@ -13,8 +13,8 @@ using Notification.API.Domain;
 using Notification.API.Infrastructure.AutofacModules;
 using Notification.API.Infrastructure.Data;
 using Notification.API.Infrastructure.Data.Repositories;
-using SharedKernel.Configurations;
-using SharedKernel.Handlers;
+using ServiceSeed.Configurations;
+using ServiceSeed.Handlers;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Notification.API
@@ -56,6 +56,7 @@ namespace Notification.API
 
             services.AddTransient<AccountInvalidatedIntegrationEventHandler>();
             services.AddTransient<AccountCreatedIntegrationEventHandler>();
+            services.AddTransient<BalanceIncreasedIntegrationEventHandler>();
 
             var container = new ContainerBuilder();
             container.Populate(services);

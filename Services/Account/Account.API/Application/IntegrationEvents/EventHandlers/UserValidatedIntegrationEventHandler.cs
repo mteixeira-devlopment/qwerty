@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Account.API.Application.Commands.Models;
 using Account.API.Application.IntegrationEvents.Events;
+using Account.API.Domain.Commands.CreateAccount;
 using EventBus.Abstractions;
 using MediatR;
 

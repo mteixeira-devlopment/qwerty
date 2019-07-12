@@ -1,13 +1,12 @@
-﻿using System;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
+﻿using System.Reflection;
 using Identity.API.Application.IntegrationEvents.EventHandlers;
 using Identity.API.Configurations;
 using Identity.API.Domain;
-using Identity.API.Infrastructure.AutofacModules;
+using Identity.API.Domain.Commands.CreateUser;
 using Identity.API.Infrastructure.Data;
 using Identity.API.Infrastructure.Data.Repositories;
 using Identity.API.Infrastructure.Stores;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -15,8 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SharedKernel.Configurations;
-using SharedKernel.Handlers;
+using ServiceSeed.Configurations;
+using ServiceSeed.Handlers;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Identity.API
@@ -30,7 +29,7 @@ namespace Identity.API
 
         public IConfiguration Configuration { get; }
         
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -54,13 +53,8 @@ namespace Identity.API
             services.ConfigureRabbitMQEventBus(Configuration);
 
             services.AddTransient<AccountInvalidatedIntegrationEventHandler>();
-
-            var container = new ContainerBuilder();
-            container.Populate(services);
-
-            container.RegisterModule(new MediatorModule());
-
-            return new AutofacServiceProvider(container.Build());
+           
+            services.AddMediatR(typeof(CreateUserCommandHandler).GetTypeInfo().Assembly);
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

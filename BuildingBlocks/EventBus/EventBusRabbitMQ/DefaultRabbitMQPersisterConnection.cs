@@ -11,17 +11,33 @@ namespace EventBusRabbitMQ
 {
     public class DefaultRabbitMQPersisterConnection : IRabbitMQPersisterConnection
     {
+        /// <summary>
+        /// Connection factory do rabbit client.
+        /// </summary>
         private readonly IConnectionFactory _connectionFactory;
+
         private readonly ILogger<DefaultRabbitMQPersisterConnection> _logger;
+
+        /// <summary>
+        /// Contador de tentativas.
+        /// </summary>
         private readonly int _retryCount;
 
+        /// <summary>
+        /// Conexão AMQP.
+        /// </summary>
         private IConnection _connection;
         private bool _disposed;
 
-        private readonly object sync_root = new object();
+        /// <summary>
+        /// Identificador de lock para efeturar tentativa de conexaõ.
+        /// </summary>
+        private static readonly object SyncRoot = new object();
 
         public DefaultRabbitMQPersisterConnection(
-            IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQPersisterConnection> logger, int retryCount = 5)
+            IConnectionFactory connectionFactory, 
+            ILogger<DefaultRabbitMQPersisterConnection> logger, 
+            int retryCount = 5)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -30,25 +46,27 @@ namespace EventBusRabbitMQ
 
         public bool IsConnected => _connection != null && _connection.IsOpen && !_disposed;
 
+        /// <summary>
+        /// Cria e retorna um canal, sessão e modelo para a conexão.
+        /// </summary>
+        /// <returns></returns>
         public IModel CreateModel()
         {
             if (!IsConnected)
-                throw new InvalidOperationException("No RabbitMQ connection are available to perform this action");
+                throw new InvalidOperationException("Nenhuma conexão com RabbitMq está disponível para completar esta ação.");
 
-            try
-            {
-                return _connection.CreateModel();
-            }
-            catch (Exception ex) {
-                throw ex;
-            }
+            return _connection.CreateModel();
         }
 
+        /// <summary>
+        /// Executa tentativa de conexão com o RabbitMq considerando uma política de reconexão.
+        /// </summary>
+        /// <returns></returns>
         public bool TryConnect()
         {
-            _logger.LogInformation("RabbitMQ client is trying to connect.");
+            _logger.LogInformation("Tentativa de conexão com RabbitMq iniciando...");
 
-            lock (sync_root)
+            lock (SyncRoot)
             {
                 var policy = Policy
                     .Handle<SocketException>()
@@ -57,7 +75,7 @@ namespace EventBusRabbitMQ
                         _retryCount,
                         retryAttempt => 
                             TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), 
-                        (ex, time) => _logger.LogWarning(ex.ToString()));
+                            (ex, time) => _logger.LogWarning($"Tentativa de reconexão. Motivo: {ex.ToString()}"));
 
                 policy.Execute(() => _connection = _connectionFactory.CreateConnection());
 
@@ -67,11 +85,14 @@ namespace EventBusRabbitMQ
                     return true;
                 }
 
-                _logger.LogCritical($"FATAL ERROR: RabbitMQ connections could not be created and opened.");
+                _logger.LogCritical($"FATAL ERROR: Não foi possível abrir ou criar uma conexão com RabbitMq!");
                 return false;
             }
         }
 
+        /// <summary>
+        /// Inclui os eventos para controle de fluxo para a conexão obtida.
+        /// </summary>
         private void HandlerConnectedPersister()
         {
             _connection.ConnectionShutdown += OnConnectionShutdown;
@@ -79,8 +100,7 @@ namespace EventBusRabbitMQ
             _connection.ConnectionBlocked += OnConnectionBlocked;
 
             _logger.LogInformation(
-                $"RabbitMQ persistent connection acquired a connection " +
-                $"{_connection.Endpoint.HostName} and is subscribed to failure events.");
+                $"Conexão adquiria com RabbitMq {_connection.Endpoint.HostName}.");
         }
 
         public void Dispose()
@@ -95,7 +115,7 @@ namespace EventBusRabbitMQ
             }
             catch (IOException exception)
             {
-                _logger.LogCritical(exception.ToString());
+                _logger.LogCritical($"Erro ao encerrar conexão: {exception.Message}");
             }
         }
 
@@ -103,7 +123,7 @@ namespace EventBusRabbitMQ
         {
             if (_disposed) return;
 
-            _logger.LogWarning("A RabbitMQ connection is shutdown. Trying to re-connect...");
+            _logger.LogWarning("A conexão com o RabbiMq foi interrompida. Tente conectar novamente...");
 
             TryConnect();
         }
@@ -112,7 +132,7 @@ namespace EventBusRabbitMQ
         {
             if (_disposed) return;
 
-            _logger.LogWarning("A RabbitMQ connection throw exception. Trying to re-connect...");
+            _logger.LogWarning("A conexão com o RabbitMq lançou uma excessão. Tente conectar novamente...");
 
             TryConnect();
         }
@@ -121,7 +141,7 @@ namespace EventBusRabbitMQ
         {
             if (_disposed) return;
 
-            _logger.LogWarning("A RabbitMQ connection is on shutdown. Trying to re-connect...");
+            _logger.LogWarning("A conexão com o RabbiMq foi encerrada. Tente conectar novamente...");
 
             TryConnect();
         }

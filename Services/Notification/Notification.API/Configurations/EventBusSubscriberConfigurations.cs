@@ -14,6 +14,7 @@ namespace Notification.API.Configurations
 
             eventBus.Subscribe<AccountCreatedIntegrationEvent, AccountCreatedIntegrationEventHandler>();
             eventBus.Subscribe<AccountInvalidatedIntegrationEvent, AccountInvalidatedIntegrationEventHandler>();
+            eventBus.Subscribe<BalanceIncreasedIntegrationEvent, BalanceIncreasedIntegrationEventHandler>();
         }
     }
 }

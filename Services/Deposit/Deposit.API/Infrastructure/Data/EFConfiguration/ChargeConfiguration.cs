@@ -1,7 +1,7 @@
 ﻿using Deposit.API.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SharedKernel.Data.EFConfiguration;
+using ServiceSeed.Data.EFConfiguration;
 
 namespace Deposit.API.Infrastructure.Data.EFConfiguration
 {

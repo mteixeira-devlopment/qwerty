@@ -21,5 +21,10 @@ namespace Notification.API.Application.IntegrationEvents.EventHandlers
         {
             await _hubContext.Clients.All.Notify(@event.ErrorMessage.First());
         }
+
+        public void Handle2()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

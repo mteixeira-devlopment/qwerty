@@ -21,11 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\EventBus\EventBus.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\SharedKernel\SharedKernel.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Application\Commands\" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\ServiceSeed\ServiceSeed.csproj" />
   </ItemGroup>
 
 </Project>

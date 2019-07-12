@@ -13,6 +13,7 @@ namespace Account.API.Configurations
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
 
             eventBus.Subscribe<UserValidatedIntegrationEvent, UserValidatedIntegrationEventHandler>();
+            eventBus.Subscribe<DepositCreatedIntegrationEvent, DepositCreatedIntegrationEventHandler>();
         }
     }
 }
