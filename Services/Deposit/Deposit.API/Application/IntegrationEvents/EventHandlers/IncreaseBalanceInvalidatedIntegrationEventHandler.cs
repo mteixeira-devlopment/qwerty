@@ -15,15 +15,12 @@ namespace Deposit.API.Application.IntegrationEvents.EventHandlers
             _mediator = mediator;
         }
 
-        public async Task Handle(IncreaseBalanceInvalidatedIntegrationEvent @event)
+        public async Task<bool> Handle(IncreaseBalanceInvalidatedIntegrationEvent @event)
         {
             var cancelDepositChargeCommandModel = new CancelDepositChargeCommandModel(@event.DepositId, @event.ErrorMessages);
-            await _mediator.Send(cancelDepositChargeCommandModel);
-        }
+            var cancelDepositChargeCommandExecution = await _mediator.Send(cancelDepositChargeCommandModel);
 
-        public void Handle2()
-        {
-            throw new System.NotImplementedException();
+            return cancelDepositChargeCommandExecution.Success;
         }
     }
 }

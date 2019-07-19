@@ -2,7 +2,6 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Autofac;
 using EventBus;
 using EventBus.Abstractions;
 using EventBus.Events;
@@ -37,12 +36,6 @@ namespace EventBusRabbitMQ
         /// Gerenciador de eventos e manipuladores em memória.
         /// </summary>
         private readonly IEventBusSubscriptionManager _subscriptionManager;
-
-        /// <summary>
-        /// Injetor em tempo de execução para os manipuladores processados.
-        /// </summary>
-        private readonly ILifetimeScope _autofac;
-        private readonly string AUTOFAC_SCOPE_NAME = "qwerty_event_bus";
 
         private readonly IServiceProvider _serviceProvider;
 
@@ -101,19 +94,25 @@ namespace EventBusRabbitMQ
 
             var channel = _persister.CreateModel();
 
-            channel.ExchangeDeclare(BROKER_NAME, "fanout");
-            channel.QueueDeclare(_queueName, true, false, false, null);
+            channel.ExchangeDeclare(BROKER_NAME, "topic");
+            channel.QueueDeclare(queue: _queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
             channel.CallbackException += (sender, ea) =>
             {
                 _consumerChannel.Dispose();
-                _consumerChannel = CreateConsumerChannel();
 
+                _consumerChannel = CreateConsumerChannel();
                 StartBasicConsume();
             };
 
             return channel;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Publica um evento recebido por parâmetro.
         /// </summary>
@@ -122,18 +121,19 @@ namespace EventBusRabbitMQ
         {
             if (!_persister.IsConnected) _persister.TryConnect();
 
-            var policy = Policy.Handle<BrokerUnreachableException>()
-                .Or<SocketException>()
-                .WaitAndRetry(
+            var policyBuilder = Policy.Handle<BrokerUnreachableException>()
+                .Or<SocketException>();
+
+            var policy = policyBuilder.WaitAndRetry(
                     _retryCount,
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                     (ex, time)
                         => _logger.LogWarning(
                             ex,
-                            $"Não foi possível public o evento {@event.EventId} após {time.TotalSeconds:N1}s",
+                            $"Não foi possível publicar o evento {@event.EventId} após {time.TotalSeconds:N1}s",
                             ex.Message));
 
-            CreateModel(@event, policy);
+            CreateModelAndPublish(@event, policy);
         }
 
         /// <summary>
@@ -142,13 +142,13 @@ namespace EventBusRabbitMQ
         /// </summary>
         /// <param name="event"></param>
         /// <param name="policy"></param>
-        private void CreateModel(IntegrationEvent @event, RetryPolicy policy)
+        private void CreateModelAndPublish(IntegrationEvent @event, RetryPolicy policy)
         {
             using (var channel = _persister.CreateModel())
             {
                 var eventName = @event.GetType().Name;
 
-                channel.ExchangeDeclare(BROKER_NAME, "fanout");
+                channel.ExchangeDeclare(BROKER_NAME, "topic");
 
                 var message = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(message);
@@ -158,7 +158,12 @@ namespace EventBusRabbitMQ
                     var properties = channel.CreateBasicProperties();
                     properties.DeliveryMode = 2;
 
-                    channel.BasicPublish(BROKER_NAME, eventName, true, properties, body);
+                    channel.BasicPublish(
+                        exchange: BROKER_NAME, 
+                        routingKey: eventName, 
+                        mandatory: true, 
+                        basicProperties: properties, 
+                        body: body);
                 });
             }
         }
@@ -204,7 +209,7 @@ namespace EventBusRabbitMQ
             if (!_persister.IsConnected) _persister.TryConnect();
 
             using (var channel = _persister.CreateModel())
-                channel.QueueBind(_queueName, BROKER_NAME, eventName);
+                channel.QueueBind(queue: _queueName, exchange: BROKER_NAME, routingKey: eventName);
         }
 
         /// <summary>
@@ -232,14 +237,13 @@ namespace EventBusRabbitMQ
         /// </summary>
         private void StartBasicConsume()
         {
-            if (_consumerChannel != null)
-            {
-                var consumer = new AsyncEventingBasicConsumer(_consumerChannel);
+            if (_consumerChannel == null) return;
 
-                consumer.Received += ConsumerReceived;
+            var consumer = new AsyncEventingBasicConsumer(_consumerChannel);
 
-                _consumerChannel.BasicConsume(_queueName, false, consumer);
-            }
+            consumer.Received += ConsumerReceived;
+
+            _consumerChannel.BasicConsume(_queueName, false, consumer);
         }
 
         /// <summary>
@@ -254,15 +258,28 @@ namespace EventBusRabbitMQ
             var eventName = eventArgs.RoutingKey;
             var message = Encoding.UTF8.GetString(eventArgs.Body);
 
-            try
+            // Verifica se há assinantes para o evento.
+            if (_subscriptionManager.HasSubscriptionsForEvent(eventName))
             {
-                await ProcessEvent(eventName, message);
-                _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
+                // Obtem os assinantes.
+                var subscriptions = _subscriptionManager.GetHandlersForEvent(eventName);
+                foreach (var subscription in subscriptions)
+                {
+                    var policyBuilder = Policy.HandleResult<bool>(
+                        successfullyExecution => !successfullyExecution);
 
-            }
-            catch (Exception exception)
-            {
-                _logger.LogWarning(exception, $"Não foi possível processar a mensagem: {message}");
+                    var policy = policyBuilder.WaitAndRetry(
+                        _retryCount,
+                        retryAttept => TimeSpan.FromSeconds(30),
+                        (a, retryDelay) => _logger
+                            .LogWarning($@"Falha no processamento da mensagem: {message}, 
+                                retentativa em {retryDelay} segundos."));
+
+                    policy.Execute(
+                        () => ProcessEvent(eventName, message, subscription).Result);
+
+                    _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
+                }
             }
         }
 
@@ -272,43 +289,36 @@ namespace EventBusRabbitMQ
         /// <param name="eventName"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        private async Task ProcessEvent(string eventName, string message)
+        private async Task<bool> ProcessEvent(
+            string eventName, string message, InMemoryEventBusSubscriptionsManager.SubscriptionInfo subscription)
         {
-            // Verifica se há assinantes para o evento.
-            if (_subscriptionManager.HasSubscriptionsForEvent(eventName))
+            if (subscription.IsDynamic)
             {
-                // Obtem os assinantes.
-                var subscriptions = _subscriptionManager.GetHandlersForEvent(eventName);
-                foreach (var subscription in subscriptions)
-                {
-                    if (subscription.IsDynamic)
-                    {
-                        // Para assinantes dinâmicos.
-                        if (!(_serviceProvider.GetRequiredService(subscription.HandlerType) 
-                            is IDynamicIntegrationEventHandler handler))
-                                throw new Exception($"Erro ao obter o handler do evento {eventName}");
+                // Para assinantes dinâmicos.
+                if (!(_serviceProvider.GetRequiredService(subscription.HandlerType)
+                    is IDynamicIntegrationEventHandler handler))
+                    throw new Exception($"Erro ao obter o handler do evento {eventName}");
 
-                        dynamic eventData = JObject.Parse(message);
-                        await handler.Handle(eventData);
-                    }
-                    else
-                    {
-                        // Para assinantes tipados.
-                        var eventType = _subscriptionManager.GetEventTypeByName(eventName);
+                dynamic eventData = JObject.Parse(message);
+                return await handler.Handle(eventData);
+            }
+            else
+            {
+                // Para assinantes tipados.
+                var eventType = _subscriptionManager.GetEventTypeByName(eventName);
 
-                        // Obtem o evento a partir da mensagem e do tipo.
-                        var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                // Obtem o evento a partir da mensagem e do tipo.
+                var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
 
-                        // Obtem o handler injetado com base no evento.
-                        var handler = _serviceProvider.GetRequiredService(subscription.HandlerType);
+                // Obtem o handler injetado com base no evento.
+                var handler = _serviceProvider.GetRequiredService(subscription.HandlerType);
 
-                        // Obtem o type genérico do handler do evento.
-                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-
-                        // Invoca o método.
-                        concreteType.GetMethod("Handle").Invoke(handler, new[] { integrationEvent });
-                    }
-                }
+                // Obtem o type genérico do handler do evento.
+                var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                
+                return (bool) concreteType
+                    .GetMethod("Handle")
+                    .Invoke(handler, new[] { integrationEvent });
             }
         }
 

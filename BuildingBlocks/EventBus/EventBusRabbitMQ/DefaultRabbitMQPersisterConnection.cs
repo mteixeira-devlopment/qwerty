@@ -85,7 +85,8 @@ namespace EventBusRabbitMQ
                     return true;
                 }
 
-                _logger.LogCritical($"FATAL ERROR: Não foi possível abrir ou criar uma conexão com RabbitMq!");
+                _logger.LogCritical(@"FATAL ERROR: Não foi possível abrir ou criar 
+                                    uma conexão com RabbitMq!");
                 return false;
             }
         }

@@ -23,7 +23,7 @@ namespace Notification.API.Application.IntegrationEvents.EventHandlers
             _notificationRepository = notificationRepository;
         }
 
-        public async Task Handle(AccountCreatedIntegrationEvent @event)
+        public async Task<bool> Handle(AccountCreatedIntegrationEvent @event)
         {
             var notification = new Not(
                         "Conta criada com sucesso!",
@@ -37,11 +37,8 @@ namespace Notification.API.Application.IntegrationEvents.EventHandlers
             await _notificationRepository.Commit();
 
             await _hubContext.Clients.All.Notify($"Conta {@event.AccountNumber} criada com sucesso!");
-        }
 
-        public void Handle2()
-        {
-            throw new NotImplementedException();
+            return true;
         }
     }
 }

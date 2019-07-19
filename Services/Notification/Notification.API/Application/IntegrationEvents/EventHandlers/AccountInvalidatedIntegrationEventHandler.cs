@@ -17,14 +17,11 @@ namespace Notification.API.Application.IntegrationEvents.EventHandlers
             _hubContext = hubContext;
         }
 
-        public async Task Handle(AccountInvalidatedIntegrationEvent @event)
+        public async Task<bool> Handle(AccountInvalidatedIntegrationEvent @event)
         {
             await _hubContext.Clients.All.Notify(@event.ErrorMessage.First());
-        }
 
-        public void Handle2()
-        {
-            throw new System.NotImplementedException();
+            return true;
         }
     }
 }

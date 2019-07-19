@@ -15,12 +15,14 @@ namespace Account.API.Application.IntegrationEvents.EventHandlers
             _mediator = mediator;
         }
 
-        public async Task Handle(UserValidatedIntegrationEvent @event)
+        public async Task<bool> Handle(UserValidatedIntegrationEvent @event)
         {
             var createAccountCommandModel = new CreateAccountCommandModel(
                 @event.UserId, @event.FullName, @event.BirthDate, @event.Document);
 
-            await _mediator.Send(createAccountCommandModel);
+            var createAccountCommandExecution = await _mediator.Send(createAccountCommandModel);
+
+            return createAccountCommandExecution.Success;
         }
     }
 }

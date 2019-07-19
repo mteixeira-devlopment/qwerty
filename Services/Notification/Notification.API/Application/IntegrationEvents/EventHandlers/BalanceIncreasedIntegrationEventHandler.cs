@@ -20,7 +20,7 @@ namespace Notification.API.Application.IntegrationEvents.EventHandlers
             _notificationRepository = notificationRepository;
         }
 
-        public async Task Handle(BalanceIncreasedIntegrationEvent @event)
+        public async Task<bool> Handle(BalanceIncreasedIntegrationEvent @event)
         {
             var notification = new Domain.Notification(
                 "Depósito efetuado com sucesso!",
@@ -33,11 +33,8 @@ namespace Notification.API.Application.IntegrationEvents.EventHandlers
             await _notificationRepository.Commit();
 
             await _hubContext.Clients.All.Notify($"Depósito no valor de R$ {@event.Value} efetuado com sucesso!");
-        }
 
-        public void Handle2()
-        {
-            throw new System.NotImplementedException();
+            return true;
         }
     }
 }

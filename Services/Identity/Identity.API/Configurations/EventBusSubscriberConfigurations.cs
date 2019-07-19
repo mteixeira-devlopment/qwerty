@@ -13,6 +13,7 @@ namespace Identity.API.Configurations
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
 
             eventBus.Subscribe<AccountInvalidatedIntegrationEvent, AccountInvalidatedIntegrationEventHandler>();
+            eventBus.Subscribe<UserValidatedIntegrationEvent, UserValidatedIntegrationEventHandler>();
         }
     }
 }

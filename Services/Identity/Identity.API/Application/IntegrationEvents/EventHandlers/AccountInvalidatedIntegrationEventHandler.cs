@@ -19,15 +19,12 @@ namespace Identity.API.Application.IntegrationEvents.EventHandlers
             _eventBus = eventBus;
         }
 
-        public async Task Handle(AccountInvalidatedIntegrationEvent @event)
+        public async Task<bool> Handle(AccountInvalidatedIntegrationEvent @event)
         {
-            var cancelUser = new CancelUserCommandModel(@event.UserId);
-            await _mediator.Send(cancelUser);
-        }
+            var cancelUserCommandModel = new CancelUserCommandModel(@event.UserId);
+            var cancelUserCommandExecution = await _mediator.Send(cancelUserCommandModel);
 
-        public void Handle2()
-        {
-            throw new System.NotImplementedException();
+            return cancelUserCommandExecution.Success;
         }
     }
 }

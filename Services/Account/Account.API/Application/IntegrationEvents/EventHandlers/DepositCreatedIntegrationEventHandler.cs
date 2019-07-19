@@ -15,15 +15,12 @@ namespace Account.API.Application.IntegrationEvents.EventHandlers
             _mediator = mediator;
         }
 
-        public async Task Handle(DepositCreatedIntegrationEvent @event)
+        public async Task<bool> Handle(DepositCreatedIntegrationEvent @event)
         {
             var inscreaseBalanceCommandModel = new IncreaseBalanceCommandModel(@event.DepositId, @event.AccountId, @event.Value);
-            await _mediator.Send(inscreaseBalanceCommandModel);
-        }
+            var inscreaseBalanceCommandExecution = await _mediator.Send(inscreaseBalanceCommandModel);
 
-        public void Handle2()
-        {
-            throw new System.NotImplementedException();
+            return inscreaseBalanceCommandExecution.Success;
         }
     }
 }

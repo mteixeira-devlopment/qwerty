@@ -4,6 +4,6 @@ namespace EventBus.Abstractions
 {
     public interface IDynamicIntegrationEventHandler
     {
-        Task Handle(dynamic eventData);
+        Task<bool> Handle(dynamic eventData);
     }
 }
