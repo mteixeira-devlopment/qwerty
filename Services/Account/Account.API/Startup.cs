@@ -1,12 +1,10 @@
-﻿using System;
-using Account.API.Application.IntegrationEvents.EventHandlers;
+﻿using Account.API.Application.IntegrationEvents.EventHandlers;
 using Account.API.Configurations;
 using Account.API.Domain;
-using Account.API.Infrastructure.AutofacModules;
+using Account.API.Domain.Commands.CreateAccount;
 using Account.API.Infrastructure.Data;
 using Account.API.Infrastructure.Data.Repositories;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceSeed.Configurations;
 using ServiceSeed.Handlers;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Reflection;
 
 namespace Account.API
 {
@@ -28,7 +27,7 @@ namespace Account.API
 
         public IConfiguration Configuration { get; }
         
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -47,12 +46,7 @@ namespace Account.API
             services.AddTransient<UserValidatedIntegrationEventHandler>();
             services.AddTransient<DepositCreatedIntegrationEventHandler>();
 
-            var container = new ContainerBuilder();
-            container.Populate(services);
-
-            container.RegisterModule(new MediatorModule());
-
-            return new AutofacServiceProvider(container.Build());
+            services.AddMediatR(typeof(CreateAccountCommandHandler).GetTypeInfo().Assembly);
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

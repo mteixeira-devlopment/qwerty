@@ -1,10 +1,7 @@
-﻿using Autofac;
-using EventBus;
+﻿using EventBus;
 using EventBus.Abstractions;
-using EventBusRabbitMQ;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 using EvBusRabbitMQ = EventBusRabbitMQ.EventBusRabbitMQ;
 

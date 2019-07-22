@@ -27,10 +27,10 @@ namespace Account.API.Domain.Commands.IncreaseBalance
         public override async Task<CommandResponse> HandleCommand(IncreaseBalanceCommandModel request, CancellationToken cancellationToken)
         {
             var validModel = await CheckIfModelIsValid(request, cancellationToken).ConfigureAwait(false);
-            if (!validModel) return ReplyFailure();
+            if (!validModel) return ReplyFlowFailure();
 
             var account = await GetAccount(request.DepositId, request.AccountId, cancellationToken).ConfigureAwait(false);
-            if (account == null) return ReplyFailure();
+            if (account == null) return ReplyFlowFailure();
 
             account.IncreaseBalance(request.Value);
             await _accountRepository.UpdateBalance(account).ConfigureAwait(false);

@@ -25,19 +25,19 @@ namespace Account.API.Domain.Commands.CreateAccount
         public override async Task<CommandResponse> HandleCommand(CreateAccountCommandModel request, CancellationToken cancellationToken)
         {
             var validModel = await CheckIfModelIsValid(request, cancellationToken);
-            if (!validModel) ReplyFailure();
+            if (!validModel) ReplyFlowFailure();
 
             var document = new Document(request.Document);
             var customer = new Customer(request.FullName, request.BirthDate, document);
 
-            var account = new Domain.Account(request.UserId, customer);
+            var account = new Account(request.UserId, customer);
 
             await _accountRepository.CreateAsync(account).ConfigureAwait(false);
             await _accountRepository.Commit().ConfigureAwait(false);
 
             await PublishAccountCreatedIntegrationEvent(request.UserId, cancellationToken);
 
-            return ReplySuccessful();
+            return ReplySuccessful(account);
         }
 
         private async Task<bool> CheckIfModelIsValid(CreateAccountCommandModel requestModel, CancellationToken cancellationToken)

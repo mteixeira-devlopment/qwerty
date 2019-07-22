@@ -14,23 +14,23 @@ namespace ServiceSeed.Configurations
             {
                 var logger = persister.GetRequiredService<ILogger<DefaultRabbitMQPersisterConnection>>();
 
-                var eventBusConnectionStrings = GetEventBusConfigurationStrings(configuration);
+                var (connection, username, password, s) = GetEventBusConfigurationStrings(configuration);
 
                 var factory = new ConnectionFactory
                 {
-                    HostName = eventBusConnectionStrings.connection,
+                    HostName = connection,
                     DispatchConsumersAsync = true
                 };
 
-                if (!string.IsNullOrEmpty(eventBusConnectionStrings.username))
-                    factory.UserName = eventBusConnectionStrings.username;
+                if (!string.IsNullOrEmpty(username))
+                    factory.UserName = username;
 
-                if (!string.IsNullOrEmpty(eventBusConnectionStrings.password))
-                    factory.Password = eventBusConnectionStrings.password;
+                if (!string.IsNullOrEmpty(password))
+                    factory.Password = password;
 
                 var retryCount = 5;
-                if (!string.IsNullOrEmpty(eventBusConnectionStrings.retryCount))
-                    retryCount = int.Parse(eventBusConnectionStrings.retryCount);
+                if (!string.IsNullOrEmpty(s))
+                    retryCount = int.Parse(s);
 
                 return new DefaultRabbitMQPersisterConnection(factory, logger, retryCount);
 

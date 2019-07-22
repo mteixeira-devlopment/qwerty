@@ -13,7 +13,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     },
     {
-      "DownstreamPathTemplate": "/signup",
+      "DownstreamPathTemplate": "/{catchAll}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -21,18 +21,7 @@
           "Port": 7001
         }
       ],
-      "UpstreamPathTemplate": "/identity-api/signup"
-    },
-    {
-      "DownstreamPathTemplate": "/signin/{catchAll}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7001
-        }
-      ],
-      "UpstreamPathTemplate": "/identity-api/signin/{catchAll}"
+      "UpstreamPathTemplate": "/identity-api/{catchAll}"
     },
     {
       "DownstreamPathTemplate": "/api/values",

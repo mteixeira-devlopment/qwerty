@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using ServiceSeed.Commands;
 using ServiceSeed.Handlers;
 using ServiceSeed.Responses;
 
@@ -19,21 +21,9 @@ namespace ServiceSeed.Api
         protected IActionResult ReplyQuery(object items)
             => Ok(items);
 
-        protected IActionResult Reply(object result)
-            => IsValidRequest()
-                ? Ok(new SuccessResponse(result))
-                : Reply();
-
-        protected IActionResult Reply()
+        protected IActionResult ReplyOk(object result)
         {
-            var notifications = NotificationHandler
-                .GetNotifications();
-
-            var errors = notifications
-                .Select(n => n.ErrorMessage)
-                .ToList();
-
-            return UnprocessableEntity(new ErrorResponse(errors, 422));
+            return Ok(new SuccessResponse(result));
         }
 
         protected IActionResult ReplyCreated(object result)
@@ -46,16 +36,33 @@ namespace ServiceSeed.Api
 
         protected IActionResult ReplyBadRequest(string requestError)
         {
-            const int statusCode = 400;
-
             var errors = new List<string> { requestError };
-            return BadRequest(new ErrorResponse(errors, statusCode));
+            return BadRequest(new ErrorResponse(errors, 400));
         }
 
-        protected IActionResult ReplyUnprocessableEntity(List<string> errors)
+        protected IActionResult ReplyFailure(int executionResult)
+        {
+            if (executionResult == (int) CommandExecutionResponseTypes.ExecutionFailure)
+                return ReplyInternalServerError();
+
+            var notifications = NotificationHandler
+                .GetFailNotification();
+
+            return ReplyUnprocessableEntity(notifications);
+        }
+
+        private IActionResult ReplyUnprocessableEntity(IEnumerable<string> errors)
             => UnprocessableEntity(new ErrorResponse(errors, 422));
 
-        private bool IsValidRequest()
-            => !NotificationHandler.HasNotifications();
+        private IActionResult ReplyInternalServerError()
+        {
+            const int serverErrorStatus = (int) HttpStatusCode.InternalServerError;
+            var serverErrorMessage = NotificationHandler.GetNotExpectedNotification();
+
+            return StatusCode(serverErrorStatus, new ErrorResponse(serverErrorMessage, serverErrorStatus));
+        }
+
+        private bool IsValidExecution()
+            => !NotificationHandler.HasFailNotifications();
     }
 }

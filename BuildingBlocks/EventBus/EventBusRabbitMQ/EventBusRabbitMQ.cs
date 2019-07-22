@@ -95,11 +95,7 @@ namespace EventBusRabbitMQ
             var channel = _persister.CreateModel();
 
             channel.ExchangeDeclare(BROKER_NAME, "topic");
-            channel.QueueDeclare(queue: _queueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
+            channel.QueueDeclare(_queueName, true, false, false, null);
 
             channel.CallbackException += (sender, ea) =>
             {
@@ -158,12 +154,7 @@ namespace EventBusRabbitMQ
                     var properties = channel.CreateBasicProperties();
                     properties.DeliveryMode = 2;
 
-                    channel.BasicPublish(
-                        exchange: BROKER_NAME, 
-                        routingKey: eventName, 
-                        mandatory: true, 
-                        basicProperties: properties, 
-                        body: body);
+                    channel.BasicPublish(BROKER_NAME, eventName, true, properties, body);
                 });
             }
         }
@@ -209,7 +200,7 @@ namespace EventBusRabbitMQ
             if (!_persister.IsConnected) _persister.TryConnect();
 
             using (var channel = _persister.CreateModel())
-                channel.QueueBind(queue: _queueName, exchange: BROKER_NAME, routingKey: eventName);
+                channel.QueueBind(_queueName, BROKER_NAME, eventName);
         }
 
         /// <summary>
@@ -265,20 +256,31 @@ namespace EventBusRabbitMQ
                 var subscriptions = _subscriptionManager.GetHandlersForEvent(eventName);
                 foreach (var subscription in subscriptions)
                 {
-                    var policyBuilder = Policy.HandleResult<bool>(
-                        successfullyExecution => !successfullyExecution);
+                    var policyContext = new Context(eventName);
 
-                    var policy = policyBuilder.WaitAndRetry(
+                    var policyBuilder = Policy.HandleResult<bool>(
+                        successfullyExecution => successfullyExecution);
+
+                    var policy = policyBuilder.WaitAndRetryAsync(
                         _retryCount,
                         retryAttept => TimeSpan.FromSeconds(30),
-                        (a, retryDelay) => _logger
+                        (executionResult, retryDelay, ctx) => _logger
                             .LogWarning($@"Falha no processamento da mensagem: {message}, 
-                                retentativa em {retryDelay} segundos."));
+                                retentativa em {retryDelay} segundos."))
+                        .WithPolicyKey(eventName);
 
-                    policy.Execute(
-                        () => ProcessEvent(eventName, message, subscription).Result);
+                    await policy.ExecuteAsync(
+                        async ctx =>
+                        {
+                            var processed = await ProcessEvent(eventName, message, subscription);
 
-                    _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
+                            if (processed) _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
+
+                            return processed;
+
+                        }, policyContext);
+
+                    
                 }
             }
         }
@@ -302,24 +304,28 @@ namespace EventBusRabbitMQ
                 dynamic eventData = JObject.Parse(message);
                 return await handler.Handle(eventData);
             }
-            else
+
+            // Para assinantes tipados.
+            var eventType = _subscriptionManager.GetEventTypeByName(eventName);
+
+            // Obtem o evento a partir da mensagem e do tipo.
+            var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+
+            using (var scope = _serviceProvider.CreateScope())
             {
-                // Para assinantes tipados.
-                var eventType = _subscriptionManager.GetEventTypeByName(eventName);
-
-                // Obtem o evento a partir da mensagem e do tipo.
-                var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-
                 // Obtem o handler injetado com base no evento.
-                var handler = _serviceProvider.GetRequiredService(subscription.HandlerType);
+                var handler = scope.ServiceProvider.GetRequiredService(subscription.HandlerType);
 
                 // Obtem o type genérico do handler do evento.
                 var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-                
-                return (bool) concreteType
+
+                var result = (Task<bool>) concreteType
                     .GetMethod("Handle")
                     .Invoke(handler, new[] { integrationEvent });
+
+                return await result;
             }
+
         }
 
         public void Dispose()

@@ -3,6 +3,7 @@ using Account.API.Application.IntegrationEvents.Events;
 using Account.API.Domain.Commands.IncreaseBalance;
 using EventBus.Abstractions;
 using MediatR;
+using ServiceSeed.Commands;
 
 namespace Account.API.Application.IntegrationEvents.EventHandlers
 {
@@ -20,7 +21,7 @@ namespace Account.API.Application.IntegrationEvents.EventHandlers
             var inscreaseBalanceCommandModel = new IncreaseBalanceCommandModel(@event.DepositId, @event.AccountId, @event.Value);
             var inscreaseBalanceCommandExecution = await _mediator.Send(inscreaseBalanceCommandModel);
 
-            return inscreaseBalanceCommandExecution.Success;
+            return inscreaseBalanceCommandExecution.ExecutionResult != (int) CommandExecutionResponseTypes.ExecutionFailure;
         }
     }
 }

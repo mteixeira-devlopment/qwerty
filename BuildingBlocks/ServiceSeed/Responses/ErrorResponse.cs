@@ -6,11 +6,17 @@ namespace ServiceSeed.Responses
     {
         public bool Success => false;
         public int StatusCode { get; }
-        public ICollection<string> Errors { get; }
+        public IEnumerable<string> Errors { get; }
 
-        public ErrorResponse(ICollection<string> responseErrors, int statusCode)
+        public ErrorResponse(IEnumerable<string> responseErrors, int statusCode)
         {
             Errors = responseErrors;
+            StatusCode = statusCode;
+        }
+
+        public ErrorResponse(string responseError, int statusCode)
+        {
+            Errors = new List<string>{ responseError };
             StatusCode = statusCode;
         }
     }

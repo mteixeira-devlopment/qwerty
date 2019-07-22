@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceSeed.Configurations;
 using ServiceSeed.Handlers;
+using ServiceSeed.Responses;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Identity.API
@@ -53,7 +54,9 @@ namespace Identity.API
             services.ConfigureRabbitMQEventBus(Configuration);
 
             services.AddTransient<AccountInvalidatedIntegrationEventHandler>();
-           
+
+            services.AddScoped<CommandResponse<string>>();
+
             services.AddMediatR(typeof(CreateUserCommandHandler).GetTypeInfo().Assembly);
         }
         

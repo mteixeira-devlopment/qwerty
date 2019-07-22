@@ -18,8 +18,8 @@ namespace Identity.API.Domain.Commands.CreateUser
         private readonly IUserRepository _userRepository;
 
         public CreateUserCommandHandler(
-            IEventBus eventBus, 
-            INotificationHandler notificationHandler, 
+            INotificationHandler notificationHandler,
+            IEventBus eventBus,              
             UserManager<User> userManager, 
             IUserRepository userRepository) : base(notificationHandler)
         {
@@ -32,15 +32,15 @@ namespace Identity.API.Domain.Commands.CreateUser
         public override async Task<CommandResponse> HandleCommand(CreateUserCommandModel request, CancellationToken cancellationToken)
         {
             var validModel = await CheckIfModelIsValid<CreateUserCommandValidator>(request);
-            if (!validModel) return ReplyFailure();
+            if (!validModel) return ReplyFlowFailure();
 
             var user = new User(request.Username);
 
             var doesNotExistUser = await CheckIfUserDoesNotExists(user);
-            if (!doesNotExistUser) return ReplyFailure();
+            if (!doesNotExistUser) return ReplyFlowFailure();
 
             var userCreatedSuccesfully = await TryCreateUser(user, request);
-            if (!userCreatedSuccesfully) return ReplyFailure();
+            if (!userCreatedSuccesfully) return ReplyFlowFailure();
 
             await _userRepository
                 .Commit()
@@ -57,7 +57,7 @@ namespace Identity.API.Domain.Commands.CreateUser
             if (existingUser == null)
                 return await Task.FromResult(true);
 
-            NotificationHandler.Notify("Este email já está em uso");
+            NotificationHandler.NotifyFail("Este email já está em uso");
 
             return false;
         }
@@ -71,7 +71,7 @@ namespace Identity.API.Domain.Commands.CreateUser
             if (createResult.Succeeded) return await Task.FromResult(true);
 
             foreach (var createError in createResult.Errors)
-                NotificationHandler.Notify(createError.Description);
+                NotificationHandler.NotifyFail(createError.Description);
 
             return false;
         }
@@ -81,7 +81,8 @@ namespace Identity.API.Domain.Commands.CreateUser
             var userValidated = new UserValidatedIntegrationEvent(
                 userId, requestModel.FullName, requestModel.BirthDate, requestModel.Document);
 
-            await Task.Run(() => _eventBus.Publish(userValidated));
+            #pragma warning disable 4014
+            Task.Run(() => _eventBus.Publish(userValidated));
         }
     }
 }

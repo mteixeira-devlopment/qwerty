@@ -1,16 +1,19 @@
 ﻿namespace ServiceSeed.Responses
 {
-    public sealed class CommandResponse
+    public class CommandResponse
     {
-        public bool Success { get; }
-        public object Content { get; set; }
+        public int ExecutionResult { get; }
 
-        public CommandResponse(bool success)
-            => Success = success;
+        public CommandResponse(int executionResult)
+            => ExecutionResult = executionResult;
+    }
 
-        public CommandResponse(bool success, object content)
+    public sealed class CommandResponse<TResponse> : CommandResponse
+    {
+        public TResponse Content { get; private set; }
+
+        public CommandResponse(int executionResult, TResponse content) : base(executionResult)
         {
-            Success = success;
             Content = content;
         }
     }

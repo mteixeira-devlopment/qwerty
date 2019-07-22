@@ -13,18 +13,47 @@ namespace ServiceSeed.Handlers
             _notifications = new List<Notification>();
         }
 
-        public void Notify(string errorMessage)
-            => Handle(new Notification(errorMessage));
+        public void NotifyInformation(string message)
+            => Handle(new InfoNotification(message));
 
-        public bool HasNotifications() => _notifications.Any();
+        public void NotifyWarning(string message)
+            => Handle(new WarningNotification(message));
+
+        public void NotifyFail(string message)
+            => Handle(new FailNotification(message));
+
+        public void NotifyNotExpected(string message, string stackTrace)
+        {
+            var notExpectedNotification = new NotExpectedNotification(message, stackTrace);
+
+            var orderedEvents = _notifications
+                .Select(not => not.Message);
+
+            notExpectedNotification.AddExecutionTrace(orderedEvents.ToArray());
+
+            Handle(notExpectedNotification);
+        }
+
+        public bool HasFailNotifications() => _notifications.Any(not => not.Severity == (int) Notification.NotificationSeverityTypes.Fail);
 
         public Notification GetFirst() => _notifications.First();
 
-        public List<Notification> GetNotifications() => _notifications;
+        public IEnumerable<Notification> GetNotifications() => _notifications;
 
-        public List<string> GetNotificationErrors() 
-            => _notifications.Select(n => n.ErrorMessage).ToList();
+        public IEnumerable<string> GetFailNotification()
+        {
+            return _notifications
+                .Where(not => not.Severity == (int) Notification.NotificationSeverityTypes.Fail)
+                .Select(not => not.Message);
+        }
 
-        private void Handle(Notification message) => _notifications.Add(message);
+        public string GetNotExpectedNotification()
+        {
+            return _notifications
+                .First(not => not.Severity == (int) Notification.NotificationSeverityTypes.NotExpected)
+                .Message;
+        }
+
+        private void Handle(Notification notification) => _notifications.Add(notification);
     }
 }

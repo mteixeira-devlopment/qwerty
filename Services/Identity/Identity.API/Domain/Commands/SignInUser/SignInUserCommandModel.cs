@@ -3,7 +3,7 @@ using ServiceSeed.Responses;
 
 namespace Identity.API.Domain.Commands.SignInUser
 {
-    public sealed class SignInUserCommandModel : IRequest<CommandResponse>
+    public sealed class SignInUserCommandModel : IRequest<CommandResponse<string>>
     {
         public string Username { get; private set; }
         public string Password { get; private set; }

@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceSeed.Api;
+using ServiceSeed.Commands;
 using ServiceSeed.Handlers;
 
 namespace Identity.API.Controllers
@@ -24,7 +25,7 @@ namespace Identity.API.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [ProducesResponseType(typeof(User), 201)]
+        [ProducesResponseType(typeof(string), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(422)]
         public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserCommandModel model)
@@ -33,11 +34,10 @@ namespace Identity.API.Controllers
                 return ReplyBadRequest("É necessário o preenchimento dos dados!");
 
             var result = await _mediator.Send(model);
-            if (result.Success)
-                return ReplyCreated(result.Content);
 
-            var errors = NotificationHandler.GetNotificationErrors();
-            return ReplyUnprocessableEntity(errors);
+            return result.ExecutionResult == (int) CommandExecutionResponseTypes.SuccessfullyExecution 
+                ? ReplyCreated(result) 
+                : ReplyFailure(result.ExecutionResult);
         }
     }
 }

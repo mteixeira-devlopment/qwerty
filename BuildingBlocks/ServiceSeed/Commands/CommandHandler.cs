@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
+using Newtonsoft.Json;
 using ServiceSeed.Handlers;
 using ServiceSeed.Responses;
 using ServiceSeed.Validations;
@@ -17,14 +19,36 @@ namespace ServiceSeed.Commands
 
         protected CommandHandler(INotificationHandler notificationHandler) => NotificationHandler = notificationHandler;
 
-        public CommandResponse ReplySuccessful(object content = null) => new CommandResponse(true, content);
+        public CommandResponse ReplySuccessful() 
+            => new CommandResponse((int) CommandExecutionResponseTypes.SuccessfullyExecution);
 
-        public CommandResponse ReplyFailure() => new CommandResponse(false);
+        public CommandResponse<TResponseContent> ReplySuccessful<TResponseContent>(TResponseContent content) 
+            => new CommandResponse<TResponseContent>((int) CommandExecutionResponseTypes.SuccessfullyExecution, content);
+
+        public CommandResponse ReplyFlowFailure() 
+            => new CommandResponse((int) CommandExecutionResponseTypes.FlowFailure);
+
+        public CommandResponse ReplyExecutionFailure() 
+            => new CommandResponse((int) CommandExecutionResponseTypes.ExecutionFailure);
 
         public async Task<CommandResponse> Handle(
-            TModel request, 
+            TModel request,
             CancellationToken cancellationToken = default(CancellationToken))
-            => await HandleCommand(request, cancellationToken);
+        {
+            var commandName = typeof(TModel).FullName;
+
+            NotificationHandler.NotifyInformation($"Executando comando {commandName}");
+
+            try
+            {
+                return await HandleCommand(request, cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                NotificationHandler.NotifyNotExpected(exception.Message, exception.StackTrace);
+                return ReplyExecutionFailure();
+            }
+        }
 
         public abstract Task<CommandResponse> HandleCommand(TModel request, CancellationToken cancellationToken);
 
@@ -36,7 +60,7 @@ namespace ServiceSeed.Commands
             if (validator.IsValid) return await Task.FromResult(true);
 
             foreach (var error in validator.Errors)
-                NotificationHandler.Notify(error);
+                NotificationHandler.NotifyFail(error);
 
             return await Task.FromResult(false);
         }

@@ -3,6 +3,7 @@ using Account.API.Application.IntegrationEvents.Events;
 using Account.API.Domain.Commands.CreateAccount;
 using EventBus.Abstractions;
 using MediatR;
+using ServiceSeed.Commands;
 
 namespace Account.API.Application.IntegrationEvents.EventHandlers
 {
@@ -22,7 +23,7 @@ namespace Account.API.Application.IntegrationEvents.EventHandlers
 
             var createAccountCommandExecution = await _mediator.Send(createAccountCommandModel);
 
-            return createAccountCommandExecution.Success;
+            return createAccountCommandExecution.ExecutionResult != (int) CommandExecutionResponseTypes.ExecutionFailure;
         }
     }
 }

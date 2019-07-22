@@ -38,15 +38,15 @@ namespace Identity.API.Domain.Commands.SignInUser
         public override async Task<CommandResponse> HandleCommand(SignInUserCommandModel request, CancellationToken cancellationToken)
         {
             var validModel = await CheckIfModelIsValid<SignInUserCommandValidator>(request);
-            if (!validModel) return ReplyFailure();
+            if (!validModel) return ReplyFlowFailure();
 
             var user = await GetUserIfExistsAsync(request.Username);
             if (user == null)
-                return ReplyFailure();
+                return ReplyFlowFailure();
 
             var passwordIsChecked = await CheckPasswordAsync(user, request.Password);
             if (!passwordIsChecked)
-                return ReplyFailure();
+                return ReplyFlowFailure();
 
             var token = GenerateToken(user);
 
@@ -58,7 +58,7 @@ namespace Identity.API.Domain.Commands.SignInUser
             var user = await _userManager.FindByNameAsync(userIdentity);
 
             if (user == null)
-                NotificationHandler.Notify("Nenhum usuário encontrado.");
+                NotificationHandler.NotifyFail("Nenhum usuário encontrado.");
 
             return user;
         }
@@ -69,7 +69,7 @@ namespace Identity.API.Domain.Commands.SignInUser
                 .CheckPasswordSignInAsync(user, password, false);
 
             if (!signInResult.Succeeded)
-                NotificationHandler.Notify("Senha incorreta.");
+                NotificationHandler.NotifyFail("Senha incorreta.");
 
             return signInResult.Succeeded;
         }
