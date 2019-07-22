@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Account.API.Application.IntegrationEvents.Events;
 using EventBus.Abstractions;
 using ServiceSeed.Commands;
+using ServiceSeed.Handlers;
 using ServiceSeed.Responses;
 using ServiceSeed.Validations;
 
@@ -15,8 +16,9 @@ namespace Account.API.Domain.Commands.CreateAccount
         private readonly IEventBus _eventBus;
 
         public CreateAccountCommandHandler(
+            INotificationHandler notificationHandler,
             IAccountRepository accountRepository, 
-            IEventBus eventBus)
+            IEventBus eventBus) : base(notificationHandler)
         {
             _accountRepository = accountRepository;
             _eventBus = eventBus;

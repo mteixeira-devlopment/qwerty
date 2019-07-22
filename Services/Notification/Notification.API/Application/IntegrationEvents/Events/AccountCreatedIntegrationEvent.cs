@@ -5,7 +5,7 @@ namespace Notification.API.Application.IntegrationEvents.Events
 {
     public class AccountCreatedIntegrationEvent : IntegrationEvent
     {
-        public Guid UserId { get; private set; }
-        public string AccountNumber { get; private set; }
+        public Guid UserId { get; set; }
+        public string AccountNumber { get; set; }
     }
 }

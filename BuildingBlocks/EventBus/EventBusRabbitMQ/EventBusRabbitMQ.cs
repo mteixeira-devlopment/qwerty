@@ -6,6 +6,7 @@ using EventBus;
 using EventBus.Abstractions;
 using EventBus.Events;
 using EventBus.Extensions;
+using EventBusRabbitMQ.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -20,21 +21,15 @@ namespace EventBusRabbitMQ
 {
     public class EventBusRabbitMQ : IEventBus, IDisposable
     {
-        /// <summary>
-        /// Nome dado a exchange.
-        /// Uma única exchange será utilizada com esta abordagem.
-        /// </summary>
-        const string BROKER_NAME = "qwerty_event_bus";
+        private const string BROKER_NAME = "qwerty_event_bus";
+        private const string BROKER_TYPE = "topic";
 
-        /// <summary>
-        /// Owner da conexão com o RabbitMq.
-        /// </summary>
+        private const string ERROR_QUEUE_NAME = "Error";
+        private const string AUDIT_QUEUE_NAME = "Audit";
+      
         private readonly IRabbitMQPersisterConnection _persister;
         private readonly ILogger<EventBusRabbitMQ> _logger;
-
-        /// <summary>
-        /// Gerenciador de eventos e manipuladores em memória.
-        /// </summary>
+       
         private readonly IEventBusSubscriptionManager _subscriptionManager;
 
         private readonly IServiceProvider _serviceProvider;
@@ -55,7 +50,7 @@ namespace EventBusRabbitMQ
             _logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQ>>() 
                       ?? throw new ArgumentNullException(nameof(_logger));
 
-            _subscriptionManager = serviceProvider.GetRequiredService<IEventBusSubscriptionManager>()
+            _subscriptionManager = serviceProvider.GetRequiredService<IEventBusSubscriptionManager>() 
                                    ?? new InMemoryEventBusSubscriptionsManager();
            
             _serviceProvider = serviceProvider;
@@ -63,7 +58,7 @@ namespace EventBusRabbitMQ
             _queueName = queueName;
             _retryCount = retryCount;
 
-            _consumerChannel = CreateConsumerChannel();
+            _consumerChannel = CreateConsumerChannel(_queueName);
 
             _subscriptionManager.OnEventRemoved += SubsManager_OnEventRemoved;
         }
@@ -83,36 +78,27 @@ namespace EventBusRabbitMQ
             }
         }
 
-        /// <summary>
-        /// Cria o canal consumidor e declara a fila.
-        /// </summary>
-        /// <returns></returns>
-        private IModel CreateConsumerChannel()
+        private IModel CreateConsumerChannel(string queueName)
         {
             if (!_persister.IsConnected)
                 _persister.TryConnect();
 
             var channel = _persister.CreateModel();
 
-            channel.ExchangeDeclare(BROKER_NAME, "topic");
-            channel.QueueDeclare(_queueName, true, false, false, null);
+            channel.ExchangeDeclare(BROKER_NAME, BROKER_TYPE);
+            channel.QueueDeclare(queueName, true, false, false, null);
 
             channel.CallbackException += (sender, ea) =>
             {
                 _consumerChannel.Dispose();
 
-                _consumerChannel = CreateConsumerChannel();
+                _consumerChannel = CreateConsumerChannel(queueName);
                 StartBasicConsume();
             };
 
             return channel;
         }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Publica um evento recebido por parâmetro.
-        /// </summary>
-        /// <param name="event"></param>
+        
         public void Publish(IntegrationEvent @event)
         {
             if (!_persister.IsConnected) _persister.TryConnect();
@@ -132,19 +118,13 @@ namespace EventBusRabbitMQ
             CreateModelAndPublish(@event, policy);
         }
 
-        /// <summary>
-        /// Obtem um canal, sessão e modelo com base em um evento e uma política de re-tentantivas.
-        /// Obtém a exchange do canal e publica a mensagem.
-        /// </summary>
-        /// <param name="event"></param>
-        /// <param name="policy"></param>
         private void CreateModelAndPublish(IntegrationEvent @event, RetryPolicy policy)
         {
             using (var channel = _persister.CreateModel())
             {
                 var eventName = @event.GetType().Name;
 
-                channel.ExchangeDeclare(BROKER_NAME, "topic");
+                channel.ExchangeDeclare(BROKER_NAME, BROKER_TYPE);
 
                 var message = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(message);
@@ -158,12 +138,7 @@ namespace EventBusRabbitMQ
                 });
             }
         }
-
-        /// <summary>
-        /// Assina o evento recebido por parâmetro.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="eventName"></param>
+        
         public void SubscribeDynamic<T>(string eventName) where T : IDynamicIntegrationEventHandler
         {
             _logger.LogInformation($"Assinando o evento {eventName} com {typeof(T).GetGenericTypeDefinition()}");
@@ -186,12 +161,7 @@ namespace EventBusRabbitMQ
             _subscriptionManager.AddSubscription<T, TH>();
             StartBasicConsume();
         }
-
-        /// <summary>
-        /// Agrega a assinatura interna para o gerenciador de eventos e manipuladores.
-        /// Binda o evento à fila do serviço e routing key específica daquele evento.
-        /// </summary>
-        /// <param name="eventName"></param>
+        
         private void DoInternalSubscription(string eventName)
         {
             var containsKey = _subscriptionManager.HasSubscriptionsForEvent(eventName);
@@ -202,12 +172,7 @@ namespace EventBusRabbitMQ
             using (var channel = _persister.CreateModel())
                 channel.QueueBind(_queueName, BROKER_NAME, eventName);
         }
-
-        /// <summary>
-        /// Remove a assinatura do evento recebido por parâmetro.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="eventName"></param>
+       
         public void UnsubscribeDynamic<T>(string eventName) where T : IDynamicIntegrationEventHandler
         {
             _subscriptionManager.RemoveDynamicSubscription<T>(eventName);
@@ -222,10 +187,7 @@ namespace EventBusRabbitMQ
             _logger.LogInformation($"Removendo assinatura de {eventName}");
             _subscriptionManager.RemoveSubscription<T, TH>();
         }
-
-        /// <summary>
-        /// Inicia um consumidor e atribui o evento de consumo.
-        /// </summary>
+      
         private void StartBasicConsume()
         {
             if (_consumerChannel == null) return;
@@ -236,87 +198,65 @@ namespace EventBusRabbitMQ
 
             _consumerChannel.BasicConsume(_queueName, false, consumer);
         }
-
-        /// <summary>
-        /// Consome os eventos baseados na chave de rota enviada no eventArgs.
-        /// Tenta processar o evento e confirma com o "aceite".
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="eventArgs"></param>
-        /// <returns></returns>
+     
         private async Task ConsumerReceived(object sender, BasicDeliverEventArgs eventArgs)
         {
             var eventName = eventArgs.RoutingKey;
             var message = Encoding.UTF8.GetString(eventArgs.Body);
-
-            // Verifica se há assinantes para o evento.
-            if (_subscriptionManager.HasSubscriptionsForEvent(eventName))
-            {
-                // Obtem os assinantes.
+            
+            if (_subscriptionManager.HasSubscriptionsForEvent(eventName)){
+               
                 var subscriptions = _subscriptionManager.GetHandlersForEvent(eventName);
                 foreach (var subscription in subscriptions)
                 {
                     var policyContext = new Context(eventName);
 
-                    var policyBuilder = Policy.HandleResult<bool>(
-                        successfullyExecution => successfullyExecution);
+                    var policyBuilder = Policy
+                        .HandleResult<bool>(successfullyExecution => !successfullyExecution)
+                        .Or<Exception>();
 
-                    var policy = policyBuilder.WaitAndRetryAsync(
-                        _retryCount,
-                        retryAttept => TimeSpan.FromSeconds(30),
-                        (executionResult, retryDelay, ctx) => _logger
-                            .LogWarning($@"Falha no processamento da mensagem: {message}, 
-                                retentativa em {retryDelay} segundos."))
+                    var policy = policyBuilder
+                        .WaitAndRetryAsync(
+                            _retryCount,
+                            retryAttempt => TimeSpan.FromSeconds(1), (executionResult, retryDelay, ctx) => 
+                                _logger.LogWarning($@"Falha no processamento da mensagem: {message}, retentativa em {retryDelay} segundos."))
                         .WithPolicyKey(eventName);
 
-                    await policy.ExecuteAsync(
-                        async ctx =>
-                        {
-                            var processed = await ProcessEvent(eventName, message, subscription);
+                    var policyExecution = await policy.ExecuteAsync(
+                        async ctx => await ProcessEvent(eventName, message, subscription).ConfigureAwait(false), policyContext).ConfigureAwait(false);
 
-                            if (processed) _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
+                    if (!policyExecution)
+                    {
+                        // todo: adjust error messages to error queue listener
+                        var errorIntegrationEvent = new ErrorIntegrationEvent(eventName, _queueName, "Deu ruim oh!");
+                        Publish(errorIntegrationEvent);
+                    }
 
-                            return processed;
-
-                        }, policyContext);
-
-                    
+                    _consumerChannel.BasicAck(eventArgs.DeliveryTag, false);
                 }
             }
         }
-
-        /// <summary>
-        /// Processa o evento com base no nome recebido por parâmetro.
-        /// </summary>
-        /// <param name="eventName"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
+       
         private async Task<bool> ProcessEvent(
             string eventName, string message, InMemoryEventBusSubscriptionsManager.SubscriptionInfo subscription)
         {
             if (subscription.IsDynamic)
             {
-                // Para assinantes dinâmicos.
-                if (!(_serviceProvider.GetRequiredService(subscription.HandlerType)
-                    is IDynamicIntegrationEventHandler handler))
+                if (!(_serviceProvider.GetRequiredService(subscription.HandlerType) is IDynamicIntegrationEventHandler handler))
                     throw new Exception($"Erro ao obter o handler do evento {eventName}");
 
                 dynamic eventData = JObject.Parse(message);
                 return await handler.Handle(eventData);
             }
-
-            // Para assinantes tipados.
+            
             var eventType = _subscriptionManager.GetEventTypeByName(eventName);
-
-            // Obtem o evento a partir da mensagem e do tipo.
+            
             var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
 
             using (var scope = _serviceProvider.CreateScope())
             {
-                // Obtem o handler injetado com base no evento.
                 var handler = scope.ServiceProvider.GetRequiredService(subscription.HandlerType);
-
-                // Obtem o type genérico do handler do evento.
+                
                 var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
                 var result = (Task<bool>) concreteType

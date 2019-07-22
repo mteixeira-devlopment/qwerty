@@ -3,27 +3,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using Newtonsoft.Json;
 using ServiceSeed.Handlers;
 using ServiceSeed.Responses;
 using ServiceSeed.Validations;
 
 namespace ServiceSeed.Commands
 {
-    public abstract class CommandHandler<TModel> : IRequestHandler<TModel, CommandResponse> 
-        where TModel : IRequest<CommandResponse>
+    public abstract class CommandHandler<TCommandModel> : IRequestHandler<TCommandModel, CommandResponse> 
+        where TCommandModel : IRequest<CommandResponse>
     {
         protected INotificationHandler NotificationHandler { get; set; }
-
-        protected CommandHandler() { }
 
         protected CommandHandler(INotificationHandler notificationHandler) => NotificationHandler = notificationHandler;
 
         public CommandResponse ReplySuccessful() 
             => new CommandResponse((int) CommandExecutionResponseTypes.SuccessfullyExecution);
 
-        public CommandResponse<TResponseContent> ReplySuccessful<TResponseContent>(TResponseContent content) 
-            => new CommandResponse<TResponseContent>((int) CommandExecutionResponseTypes.SuccessfullyExecution, content);
+        public CommandResponse ReplySuccessful(object content) 
+            => new CommandResponse((int) CommandExecutionResponseTypes.SuccessfullyExecution, content);
 
         public CommandResponse ReplyFlowFailure() 
             => new CommandResponse((int) CommandExecutionResponseTypes.FlowFailure);
@@ -32,11 +29,10 @@ namespace ServiceSeed.Commands
             => new CommandResponse((int) CommandExecutionResponseTypes.ExecutionFailure);
 
         public async Task<CommandResponse> Handle(
-            TModel request,
+            TCommandModel request,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var commandName = typeof(TModel).FullName;
-
+            var commandName = GetCommandName();
             NotificationHandler.NotifyInformation($"Executando comando {commandName}");
 
             try
@@ -50,12 +46,12 @@ namespace ServiceSeed.Commands
             }
         }
 
-        public abstract Task<CommandResponse> HandleCommand(TModel request, CancellationToken cancellationToken);
+        public abstract Task<CommandResponse> HandleCommand(TCommandModel request, CancellationToken cancellationToken);
 
-        protected async Task<bool> CheckIfModelIsValid<TValidator>(TModel requestModel)
-            where TValidator : AbstractValidator<TModel>
+        protected async Task<bool> CheckIfModelIsValid<TValidator>(TCommandModel requestModel)
+            where TValidator : AbstractValidator<TCommandModel>
         {
-            var validator = new CommandValidator<TModel, TValidator>(requestModel);
+            var validator = new CommandValidator<TCommandModel, TValidator>(requestModel);
 
             if (validator.IsValid) return await Task.FromResult(true);
 
@@ -63,6 +59,16 @@ namespace ServiceSeed.Commands
                 NotificationHandler.NotifyFail(error);
 
             return await Task.FromResult(false);
+        }
+
+        private string GetCommandName()
+        {
+            var commandFullName = typeof(TCommandModel).FullName;
+            var splitedCommandFullName = commandFullName.Split(".");
+
+            var commandName = splitedCommandFullName[splitedCommandFullName.Length - 2];
+
+            return commandName;
         }
     }
 }

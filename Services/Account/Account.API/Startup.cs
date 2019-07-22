@@ -38,6 +38,8 @@ namespace Account.API
             services.AddDbContext<AccountContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("STF")));
 
+            services.AddScoped<INotificationHandler, NotificationHandler>();
+
             services.AddTransient<IAccountRepository, AccountRepository>();
             
             services.ConfigureRabbitMQEventBus(Configuration);

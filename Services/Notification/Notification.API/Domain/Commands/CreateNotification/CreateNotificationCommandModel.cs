@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using ServiceSeed.Commands;
+using ServiceSeed.Handlers;
 using ServiceSeed.Responses;
 
 namespace Notification.API.Domain.Commands.CreateNotification
@@ -39,7 +40,9 @@ namespace Notification.API.Domain.Commands.CreateNotification
     {
         private readonly INotificationRepository _notificationRepository;
 
-        public CreateNotificationCommandHandler(INotificationRepository notificationRepository)
+        public CreateNotificationCommandHandler(
+            INotificationHandler notificationHandler, 
+            INotificationRepository notificationRepository): base(notificationHandler)
         {
             _notificationRepository = notificationRepository;
         }

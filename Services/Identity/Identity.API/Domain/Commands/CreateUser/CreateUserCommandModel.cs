@@ -18,6 +18,7 @@ namespace Identity.API.Domain.Commands.CreateUser
         {
             Username = username;
             Password = password;
+
             FullName = fullName;
             BirthDate = birthDate;
             Document = document;

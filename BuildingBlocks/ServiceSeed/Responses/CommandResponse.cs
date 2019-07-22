@@ -3,17 +3,14 @@
     public class CommandResponse
     {
         public int ExecutionResult { get; }
+        public object Content { get; private set; }
 
         public CommandResponse(int executionResult)
             => ExecutionResult = executionResult;
-    }
 
-    public sealed class CommandResponse<TResponse> : CommandResponse
-    {
-        public TResponse Content { get; private set; }
-
-        public CommandResponse(int executionResult, TResponse content) : base(executionResult)
+        public CommandResponse(int executionResult, object content)
         {
+            ExecutionResult = executionResult;
             Content = content;
         }
     }

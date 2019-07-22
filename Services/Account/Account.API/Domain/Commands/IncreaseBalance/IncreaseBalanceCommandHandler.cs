@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Account.API.Application.IntegrationEvents.Events;
 using EventBus.Abstractions;
 using ServiceSeed.Commands;
+using ServiceSeed.Handlers;
 using ServiceSeed.Responses;
 using ServiceSeed.Validations;
 using Acc = Account.API.Domain.Account;
@@ -17,8 +18,9 @@ namespace Account.API.Domain.Commands.IncreaseBalance
         private readonly IAccountRepository _accountRepository;
 
         public IncreaseBalanceCommandHandler(
+            INotificationHandler notificationHandler,
             IEventBus eventBus,
-            IAccountRepository accountRepository)
+            IAccountRepository accountRepository) : base(notificationHandler)
         {
             _eventBus = eventBus;
             _accountRepository = accountRepository;

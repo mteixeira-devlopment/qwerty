@@ -55,8 +55,6 @@ namespace Identity.API
 
             services.AddTransient<AccountInvalidatedIntegrationEventHandler>();
 
-            services.AddScoped<CommandResponse<string>>();
-
             services.AddMediatR(typeof(CreateUserCommandHandler).GetTypeInfo().Assembly);
         }
         

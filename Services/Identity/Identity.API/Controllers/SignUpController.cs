@@ -36,7 +36,7 @@ namespace Identity.API.Controllers
             var result = await _mediator.Send(model);
 
             return result.ExecutionResult == (int) CommandExecutionResponseTypes.SuccessfullyExecution 
-                ? ReplyCreated(result) 
+                ? ReplyCreated(result.Content) 
                 : ReplyFailure(result.ExecutionResult);
         }
     }
