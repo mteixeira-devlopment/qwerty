@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Deposit.API.Application.IntegrationEvents.Events;
 using EventBus.Abstractions;
 using ServiceSeed.Commands;
+using ServiceSeed.Handlers;
 using ServiceSeed.Responses;
 using ServiceSeed.Validations;
 
@@ -17,8 +18,9 @@ namespace Deposit.API.Domain.Commands.CancelDepositCharge
         private readonly IEventBus _eventBus;
 
         public CancelDepositChargeCommandHandler(
+            INotificationHandler notificationHandler,
             IDepositRepository depositRepository, 
-            IEventBus eventBus)
+            IEventBus eventBus): base(notificationHandler)
         {
             _depositRepository = depositRepository;
             _eventBus = eventBus;
@@ -28,7 +30,7 @@ namespace Deposit.API.Domain.Commands.CancelDepositCharge
             CancelDepositChargeCommandModel request, CancellationToken cancellationToken)
         {
             var validModel = await CheckIfModelIsValid(request);
-            if (!validModel) return ReplyFailure();
+            if (!validModel) return ReplyFlowFailure();
 
             var charge = await GetCharge(request.DepositId);
             

@@ -21,10 +21,10 @@ namespace Deposit.API.Domain.Commands.CreateDeposit
         public override async Task<CommandResponse> HandleCommand(CreateDepositCommandModel request, CancellationToken cancellationToken)
         {
             var validModel = await CheckIfModelIsValid<CreateDepositCommandValidator>(request);
-            if (!validModel) return ReplyFailure();
+            if (!validModel) return ReplyFlowFailure();
 
             var chargeValue = await TryTransformIntToDecimal(request.Value);
-            if (chargeValue == 0M) return ReplyFailure();
+            if (chargeValue == 0M) return ReplyFlowFailure();
 
             var charge = new Charge(request.ProviderChargeId, chargeValue, request.CreatedAt);
             var deposit = new Depos(request.AccountId, charge);
@@ -43,7 +43,7 @@ namespace Deposit.API.Domain.Commands.CreateDeposit
             var parsed = decimal.TryParse(stringValueWithDot, out var parsedValue);
             if (!parsed)
             {
-                NotificationHandler.Notify("Erro ao converter valor da transação!");
+                NotificationHandler.NotifyFail("Erro ao converter valor da transação!");
                 return 0M;
             };
 

@@ -1,5 +1,6 @@
 ﻿using Identity.API.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Identity.Test.Entities
 {
@@ -9,15 +10,10 @@ namespace Identity.Test.Entities
         [TestMethod]
         public void ShouldUsernameEqualsMarvin()
         {
-            var user = new User("Marvin");
-            Assert.AreEqual("Marvin", user.Username);
-        }
+            var username = It.IsAny<string>();
 
-        [TestMethod]
-        public void ShouldUsernameNotEqualsMarvin()
-        {
-            var user = new User("MarvinJ");
-            Assert.AreNotEqual("Marvin", user.Username);
+            var user = new User(username);
+            Assert.AreEqual(username, user.Username);
         }
     }
 }

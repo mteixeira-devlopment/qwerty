@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceSeed.Api;
+using ServiceSeed.Commands;
 using ServiceSeed.Handlers;
 
 namespace Deposit.API.Controllers
@@ -33,11 +34,10 @@ namespace Deposit.API.Controllers
                 return ReplyBadRequest("É necessário o preenchimento dos dados!");
 
             var result = await _mediator.Send(model);
-            if (result.Success)
-                return ReplyCreated(result.Content);
 
-            var errors = NotificationHandler.GetNotificationErrors();
-            return ReplyUnprocessableEntity(errors);
+            return result.ExecutionResult == (int) CommandExecutionResponseTypes.SuccessfullyExecution
+                ? ReplyCreated(result.Content)
+                : ReplyFailure(result.ExecutionResult);
         }
     }
 }

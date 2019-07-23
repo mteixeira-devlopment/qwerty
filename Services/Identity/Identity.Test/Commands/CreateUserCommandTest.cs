@@ -7,6 +7,7 @@ using Identity.API.Domain.Commands.CreateUser;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using ServiceSeed.Commands;
 using ServiceSeed.Handlers;
 
 namespace Identity.Test.Commands
@@ -37,47 +38,47 @@ namespace Identity.Test.Commands
         public void ShouldInvalidWhenUsernameIsNull()
         {
             _handler = new CreateUserCommandHandler(
-                _eventBusMock.Object,
                 _notificationHandlerMock.Object,
+                _eventBusMock.Object,
                 _userManagerMock.Object,
                 _userRepositoryMock.Object);
 
-            var model = new CreateUserCommandModel(null, "123456", "James Odrin", It.IsAny<DateTime>(), "23562524122");
+            var model = new CreateUserCommandModel(null, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>());
             var handled = _handler.Handle(model).Result;
 
-            Assert.IsFalse(handled.Success);
+            Assert.IsFalse(handled.ExecutionResult == (int) CommandExecutionResponseTypes.SuccessfullyExecution);
         }
 
         [TestMethod]
         public void ShouldInvalidWhenPasswordIsNull()
         {
             _handler = new CreateUserCommandHandler(
-                _eventBusMock.Object,
                 _notificationHandlerMock.Object,
+                _eventBusMock.Object,
                 _userManagerMock.Object,
                 _userRepositoryMock.Object);
 
-            var model = new CreateUserCommandModel("jodrin", null, "James Odrin", It.IsAny<DateTime>(), "23562524122");
+            var model = new CreateUserCommandModel(It.IsAny<string>(), null, It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>());
             var handled = _handler.Handle(model).Result;
 
-            Assert.IsFalse(handled.Success);
+            Assert.IsFalse(handled.ExecutionResult == (int) CommandExecutionResponseTypes.SuccessfullyExecution);
         }
 
         [TestMethod]
         public void ShouldInvalidWhenUserExists()
         {
-            _userManagerMock.Setup(userManager => userManager.FindByNameAsync("jodrin")).Returns(Task.FromResult(new User("jodrin")));
+            _userManagerMock.Setup(userManager => userManager.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User(It.IsAny<string>())));
 
             _handler = new CreateUserCommandHandler(
-                _eventBusMock.Object,
                 _notificationHandlerMock.Object,
+                _eventBusMock.Object,
                 _userManagerMock.Object,
                 _userRepositoryMock.Object);
 
             var model = new CreateUserCommandModel("jodrin", "123456", "James Odrin", It.IsAny<DateTime>(), "23562524122");
             var handled = _handler.Handle(model).Result;
 
-            Assert.IsFalse(handled.Success);
+            Assert.IsFalse(handled.ExecutionResult == (int) CommandExecutionResponseTypes.SuccessfullyExecution);
         }
 
         [TestMethod]
@@ -90,15 +91,15 @@ namespace Identity.Test.Commands
                     .CreateAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(IdentityResult.Failed()));
 
             _handler = new CreateUserCommandHandler(
-                _eventBusMock.Object,
                 _notificationHandlerMock.Object,
+                _eventBusMock.Object,
                 _userManagerMock.Object,
                 _userRepositoryMock.Object);
 
-            var model = new CreateUserCommandModel("jodrin", "123456", "James Odrin", It.IsAny<DateTime>(), "23562524122");
+            var model = new CreateUserCommandModel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>());
             var handled = _handler.Handle(model).Result;
 
-            Assert.IsFalse(handled.Success);
+            Assert.IsFalse(handled.ExecutionResult == (int)CommandExecutionResponseTypes.SuccessfullyExecution);
         }
 
         [TestMethod]
@@ -115,15 +116,15 @@ namespace Identity.Test.Commands
             _eventBusMock.Setup(bus => bus.Publish(It.IsAny<IntegrationEvent>()));
 
             _handler = new CreateUserCommandHandler(
-                _eventBusMock.Object,
                 _notificationHandlerMock.Object,
+                _eventBusMock.Object,
                 _userManagerMock.Object,
                 _userRepositoryMock.Object);
 
-            var model = new CreateUserCommandModel("jodrin", "123456", "James Odrin", It.IsAny<DateTime>(), "23562524122");
+            var model = new CreateUserCommandModel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>());
             var handled = _handler.Handle(model).Result;
 
-            Assert.IsTrue(handled.Success);
+            Assert.IsTrue(handled.ExecutionResult == (int)CommandExecutionResponseTypes.SuccessfullyExecution);
         }
     }
 }

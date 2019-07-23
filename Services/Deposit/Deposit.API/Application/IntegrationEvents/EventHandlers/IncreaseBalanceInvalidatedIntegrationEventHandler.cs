@@ -3,6 +3,7 @@ using Deposit.API.Application.IntegrationEvents.Events;
 using Deposit.API.Domain.Commands.CancelDepositCharge;
 using EventBus.Abstractions;
 using MediatR;
+using ServiceSeed.Commands;
 
 namespace Deposit.API.Application.IntegrationEvents.EventHandlers
 {
@@ -20,7 +21,7 @@ namespace Deposit.API.Application.IntegrationEvents.EventHandlers
             var cancelDepositChargeCommandModel = new CancelDepositChargeCommandModel(@event.DepositId, @event.ErrorMessages);
             var cancelDepositChargeCommandExecution = await _mediator.Send(cancelDepositChargeCommandModel);
 
-            return cancelDepositChargeCommandExecution.Success;
+            return cancelDepositChargeCommandExecution.ExecutionResult != (int) CommandExecutionResponseTypes.ExecutionFailure;
         }
     }
 }

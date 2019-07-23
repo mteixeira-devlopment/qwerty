@@ -32,21 +32,22 @@ namespace Deposit.API.Domain.Commands.DepositCreditCard
         public override async Task<CommandResponse> HandleCommand(DepositCreditCardCommandModel request, CancellationToken cancellationToken)
         {
             var validModel = await CheckIfModelIsValid<DepositCreditCardCommandValidator>(request);
-            if (!validModel) return ReplyFailure();
+            if (!validModel) return ReplyFlowFailure();
 
             var providerCharge = await CreateCharge(request.Value, cancellationToken);
-            if (providerCharge == null) return ReplyFailure();
+            if (providerCharge == null) return ReplyFlowFailure();
 
             var createDepositCommandModel = new CreateDepositCommandModel(
                 request.AccountId, providerCharge.ChargeId, providerCharge.Total, providerCharge.CreatedAt);
 
             var createDepositResponse = await _mediator.Send(createDepositCommandModel, cancellationToken);
-            if (!createDepositResponse.Success) return ReplyFailure();
+            if (createDepositResponse.ExecutionResult 
+                != (int) CommandExecutionResponseTypes.SuccessfullyExecution) return ReplyFlowFailure();
 
             var depositId = (Guid) createDepositResponse.Content;
 
             var paid = await PayCharge(request.PaymentToken, providerCharge.ChargeId);
-            if (!paid) ReplyFailure();
+            if (!paid) ReplyFlowFailure();
 
             await PublishDepositCreatedIntegrationEvent(depositId, request.AccountId, request.Value);
 
@@ -60,7 +61,7 @@ namespace Deposit.API.Domain.Commands.DepositCreditCard
             var chargingResponse = await _payRepository.CreateCharge(chargeBody);
             if (!chargingResponse.Success)
             {
-                NotificationHandler.Notify(chargingResponse.Error);
+                NotificationHandler.NotifyFail(chargingResponse.Error);
                 return null;
             }
 
@@ -80,7 +81,7 @@ namespace Deposit.API.Domain.Commands.DepositCreditCard
 
             if (!paymentResponse.Success)
             {
-                NotificationHandler.Notify(paymentResponse.Error);
+                NotificationHandler.NotifyFail(paymentResponse.Error);
                 return false;
             }
 
